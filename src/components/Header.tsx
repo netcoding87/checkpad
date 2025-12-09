@@ -1,47 +1,47 @@
+import { Box, Flex, Heading, IconButton } from '@chakra-ui/react'
 import { Link } from '@tanstack/react-router'
 import { Moon, Plane, Sun } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { useColorMode, useColorModeValue } from './ui/color-mode'
 
 export default function Header() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
+  const { colorMode, toggleColorMode } = useColorMode()
+  const headerBg = useColorModeValue('gray.800', 'gray.900')
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null
-    const prefersDark = window.matchMedia(
-      '(prefers-color-scheme: dark)',
-    ).matches
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light')
-    setTheme(initialTheme)
-    document.documentElement.classList.toggle('dark', initialTheme === 'dark')
+    setMounted(true)
   }, [])
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'dark' ? 'light' : 'dark'
-    setTheme(newTheme)
-    localStorage.setItem('theme', newTheme)
-    document.documentElement.classList.toggle('dark', newTheme === 'dark')
-  }
-
   return (
-    <header className="p-4 flex items-center justify-between bg-gray-800 dark:bg-gray-900 text-white shadow-lg">
-      <Link
-        to="/"
-        className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-      >
-        <Plane className="w-8 h-8 text-cyan-400" />
-        <h1 className="text-2xl font-bold">checkPAD</h1>
-      </Link>
-      <button
-        onClick={toggleTheme}
-        className="p-2 rounded-lg hover:bg-gray-700 dark:hover:bg-gray-800 transition-colors"
-        aria-label="Toggle theme"
-      >
-        {theme === 'dark' ? (
-          <Sun className="w-6 h-6 text-yellow-400" />
-        ) : (
-          <Moon className="w-6 h-6 text-slate-700" />
-        )}
-      </button>
-    </header>
+    <Box as="header" bg={headerBg} color="white" px={4} py={4} shadow="lg">
+      <Flex justify="space-between" align="center">
+        <Link to="/" style={{ textDecoration: 'none' }}>
+          <Flex
+            align="center"
+            gap={3}
+            _hover={{ opacity: 0.8 }}
+            transition="opacity 0.2s"
+          >
+            <Plane size={32} color="#22d3ee" />
+            <Heading as="h1" size="xl" fontWeight="bold">
+              checkPAD
+            </Heading>
+          </Flex>
+        </Link>
+        <IconButton
+          onClick={toggleColorMode}
+          aria-label="Toggle theme"
+          variant="ghost"
+          colorPalette="gray"
+        >
+          {mounted && colorMode === 'dark' ? (
+            <Sun size={24} color="#fbbf24" />
+          ) : (
+            <Moon size={24} color="#64748b" />
+          )}
+        </IconButton>
+      </Flex>
+    </Box>
   )
 }

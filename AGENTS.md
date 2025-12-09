@@ -11,7 +11,7 @@ This document must be updated whenever architectural decisions, dependencies, or
 - **Name:** Checkpad
 - **Purpose:** Aircraft maintenance management with invoice tracking
 - **Stack:** TanStack Start (React 19), Vite 7, React Compiler, Tailwind CSS 4, TypeScript, Nitro (SSR), TanStack Router
-- **Tooling:** Husky + Commitlint (conventional commits)
+- **Tooling:** Husky + Commitlint (conventional commits), Volta (Node 24.11.1 LTS)
 
 ## Architecture & Conventions
 - **Routing:** File-based routes in `src/routes/` using `createFileRoute`. Root layout in `__root.tsx` provides global head, styles, and devtools.
@@ -22,6 +22,7 @@ This document must be updated whenever architectural decisions, dependencies, or
 - **Devtools:** TanStack Devtools and Router Devtools mounted in root shell for debugging.
 - **SSR/Build:** Vite with `@tanstack/react-start/plugin/vite` and Nitro for server rendering.
 - **Git Hooks:** Husky `commit-msg` hook enforces conventional commits via commitlint.
+- **Runtime:** Node pinned via Volta (`24.11.1` LTS) to satisfy TanStack Start engine requirements.
 
 ## Project Structure (current)
 ```
@@ -50,6 +51,7 @@ prettier.config.js    # Formatting rules
 - `npm run check` – Format + lint with fixes
 - `npm test` – Run Vitest
 - `npm run prepare` – Install Husky hooks (commit-msg with commitlint)
+- Volta will automatically use Node `24.11.1` in this project; install Volta globally if not present.
 
 ## Coding Standards
 - TypeScript `strict` enabled; keep types tight.

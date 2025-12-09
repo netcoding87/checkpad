@@ -54,12 +54,14 @@ prettier.config.js    # Formatting rules
 - `npm run dev` – Start dev server (port 3000)
 - `npm run build` – Production build
 - `npm run preview` – Preview production build
+- `npm test` – Run all tests once
+- `npm run test:watch` – Run tests in watch mode (TDD workflow)
+- `npm run test:coverage` – Generate and display coverage report
+- `npm run test:ui` – Open Vitest UI for interactive testing
 - `npm run lint` – Run ESLint
 - `npm run format` – Run Prettier (no write)
 - `npm run check` – Format + lint with fixes
-- `npm test` – Run Vitest
 - `npm run prepare` – Install Husky hooks (commit-msg with commitlint)
-- Volta will automatically use Node `24.11.1` in this project; install Volta globally if not present.
 - Volta will automatically use Node `24.11.1` in this project; install Volta globally if not present.
 
 ## Coding Standards
@@ -82,7 +84,22 @@ prettier.config.js    # Formatting rules
 
 ## Testing & Quality
 
-- Vitest + Testing Library available; add tests alongside code.
+### Test-Driven Development (TDD)
+
+- **Philosophy:** Follow TDD principles; write tests before implementation when possible.
+- **Coverage Target:** Maintain minimum 90% code coverage (goal: 95%).
+- **Coverage Thresholds:** Enforced at 90% for lines, functions, branches, and statements in `vitest.config.ts`.
+- **Testing Stack:** Vitest + Testing Library + jest-dom for assertions.
+- **Mocking Strategy:** Avoid excessive mocking; prefer real implementations and integration tests.
+- **Network Requests:** Use MSW (Mock Service Worker) when API integration is added (not yet installed).
+- **Test Location:** Co-locate tests with source files (e.g., `Header.test.tsx` alongside `Header.tsx`).
+- **Setup:** Global test setup in `src/test/setup.ts` configures jsdom, localStorage, and matchMedia mocks.
+- **Commands:**
+  - `npm test` – Run all tests once
+  - `npm run test:watch` – Run tests in watch mode
+  - `npm run test:coverage` – Generate coverage report
+  - `npm run test:ui` – Open Vitest UI
+- Pre-commit hook runs `vitest related --run` for staged files via lint-staged.
 - Run `npm run check` before commits to keep formatting and linting clean.
 
 ## How to Update This Document

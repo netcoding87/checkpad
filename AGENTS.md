@@ -18,7 +18,8 @@ This document must be updated whenever architectural decisions, dependencies, or
 
 - **Routing:** File-based routes in `src/routes/` using `createFileRoute`. Root layout in `__root.tsx` provides global head, styles, and devtools.
 - **Router Setup:** Router created in `src/router.tsx` using generated `routeTree.gen.ts`. Scroll restoration enabled.
-- **Styling:** Tailwind CSS 4 via `src/styles.css` (imported in root route). Gradient hero on landing page.
+- **Styling:** Tailwind CSS 4 via `src/styles.css` (imported in root route). Gradient hero on landing page. Dark mode supported via localStorage and `dark` class on `html` element.
+- **Theming:** Light/dark theme toggle in Header component; persists to localStorage, defaults to system preference.
 - **Path Aliases:** `@/*` → `./src/*` (configured in `tsconfig.json` and `vite.config.ts`).
 - **React Compiler:** Enabled via Babel plugin in `vite.config.ts`; avoid unnecessary manual memoization unless profiling demands it.
 - **Devtools:** TanStack Devtools and Router Devtools mounted in root shell for debugging.
@@ -26,6 +27,7 @@ This document must be updated whenever architectural decisions, dependencies, or
 - **Git Hooks:** Husky `commit-msg` hook enforces conventional commits via commitlint.
 - **Pre-commit:** lint-staged (configured in `lint-staged.config.cjs`) runs ESLint (`--fix --max-warnings=0`), Prettier (`--write`), and `vitest related --run` for staged TS/TSX files.
 - **Runtime:** Node pinned via Volta (`24.11.1` LTS) to satisfy TanStack Start engine requirements.
+- **Branding:** Logo uses Plane icon from lucide-react; favicon is SVG-based Plane icon in cyan on transparent background.
 
 ## Project Structure (current)
 

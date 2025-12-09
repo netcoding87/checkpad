@@ -11,6 +11,7 @@ This document must be updated whenever architectural decisions, dependencies, or
 - **Name:** Checkpad
 - **Purpose:** Aircraft maintenance management with invoice tracking
 - **Stack:** TanStack Start (React 19), Vite 7, React Compiler, Tailwind CSS 4, TypeScript, Nitro (SSR), TanStack Router
+- **Tooling:** Husky + Commitlint (conventional commits)
 
 ## Architecture & Conventions
 - **Routing:** File-based routes in `src/routes/` using `createFileRoute`. Root layout in `__root.tsx` provides global head, styles, and devtools.
@@ -20,6 +21,7 @@ This document must be updated whenever architectural decisions, dependencies, or
 - **React Compiler:** Enabled via Babel plugin in `vite.config.ts`; avoid unnecessary manual memoization unless profiling demands it.
 - **Devtools:** TanStack Devtools and Router Devtools mounted in root shell for debugging.
 - **SSR/Build:** Vite with `@tanstack/react-start/plugin/vite` and Nitro for server rendering.
+- **Git Hooks:** Husky `commit-msg` hook enforces conventional commits via commitlint.
 
 ## Project Structure (current)
 ```
@@ -47,6 +49,7 @@ prettier.config.js    # Formatting rules
 - `npm run format` – Run Prettier (no write)
 - `npm run check` – Format + lint with fixes
 - `npm test` – Run Vitest
+- `npm run prepare` – Install Husky hooks (commit-msg with commitlint)
 
 ## Coding Standards
 - TypeScript `strict` enabled; keep types tight.

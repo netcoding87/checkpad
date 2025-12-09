@@ -8,12 +8,14 @@ This document must be updated whenever architectural decisions, dependencies, or
 ---
 
 ## Project Overview
+
 - **Name:** Checkpad
 - **Purpose:** Aircraft maintenance management with invoice tracking
 - **Stack:** TanStack Start (React 19), Vite 7, React Compiler, Tailwind CSS 4, TypeScript, Nitro (SSR), TanStack Router
-- **Tooling:** Husky + Commitlint (conventional commits), Volta (Node 24.11.1 LTS)
+- **Tooling:** Husky + Commitlint (conventional commits), lint-staged (pre-commit), Volta (Node 24.11.1 LTS)
 
 ## Architecture & Conventions
+
 - **Routing:** File-based routes in `src/routes/` using `createFileRoute`. Root layout in `__root.tsx` provides global head, styles, and devtools.
 - **Router Setup:** Router created in `src/router.tsx` using generated `routeTree.gen.ts`. Scroll restoration enabled.
 - **Styling:** Tailwind CSS 4 via `src/styles.css` (imported in root route). Gradient hero on landing page.
@@ -22,9 +24,11 @@ This document must be updated whenever architectural decisions, dependencies, or
 - **Devtools:** TanStack Devtools and Router Devtools mounted in root shell for debugging.
 - **SSR/Build:** Vite with `@tanstack/react-start/plugin/vite` and Nitro for server rendering.
 - **Git Hooks:** Husky `commit-msg` hook enforces conventional commits via commitlint.
+- **Pre-commit:** lint-staged (configured in `lint-staged.config.cjs`) runs ESLint (`--fix --max-warnings=0`), Prettier (`--write`), and `vitest related --run` for staged TS/TSX files.
 - **Runtime:** Node pinned via Volta (`24.11.1` LTS) to satisfy TanStack Start engine requirements.
 
 ## Project Structure (current)
+
 ```
 src/
 ├── components/       # Reusable UI components (e.g., Header)
@@ -39,10 +43,12 @@ prettier.config.js    # Formatting rules
 ```
 
 ## Domain Focus (initial)
+
 - **Aircraft Maintenance:** Landing page messaging set; features to be implemented.
 - **Invoices:** Planned state management and workflows; not yet implemented.
 
 ## Commands
+
 - `npm run dev` – Start dev server (port 3000)
 - `npm run build` – Production build
 - `npm run preview` – Preview production build
@@ -52,8 +58,10 @@ prettier.config.js    # Formatting rules
 - `npm test` – Run Vitest
 - `npm run prepare` – Install Husky hooks (commit-msg with commitlint)
 - Volta will automatically use Node `24.11.1` in this project; install Volta globally if not present.
+- Volta will automatically use Node `24.11.1` in this project; install Volta globally if not present.
 
 ## Coding Standards
+
 - TypeScript `strict` enabled; keep types tight.
 - Prefer functional components; co-locate simple UI in routes, extract shared UI to `src/components/`.
 - Use Tailwind utility classes for styling; keep `styles.css` for global/base styles only.
@@ -61,18 +69,22 @@ prettier.config.js    # Formatting rules
 - For navigation, use `Link` from TanStack Router (see `Header`).
 
 ## React Compiler Notes
+
 - Automatic memoization is on; avoid premature `useMemo`/`useCallback`/`memo` unless measured.
 - Keep components pure; avoid side effects in render paths.
 
 ## Data & State (current status)
+
 - No persistent storage yet; future integration may use databases/ORM.
 - No global state library yet; consider TanStack Router loaders/actions or lightweight state (Zustand/Jotai) when needed.
 
 ## Testing & Quality
+
 - Vitest + Testing Library available; add tests alongside code.
 - Run `npm run check` before commits to keep formatting and linting clean.
 
 ## How to Update This Document
+
 1. Reflect any new routes, components, or architectural patterns.
 2. Document new dependencies or tooling changes.
 3. Adjust commands if scripts change.
@@ -80,6 +92,7 @@ prettier.config.js    # Formatting rules
 5. Refresh the "Last Updated" date with each change.
 
 ## Open Items / Next Steps
+
 - Add domain routes for aircraft and invoice management flows.
 - Implement invoice state handling and data layer.
 - Introduce authentication/authorization once requirements are set.

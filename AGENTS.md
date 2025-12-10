@@ -1,7 +1,7 @@
 # AGENTS.md
 
 **Living Document for AI Coding Assistants**  
-Last Updated: 2025-12-09
+Last Updated: 2025-12-10
 
 This document must be updated whenever architectural decisions, dependencies, or conventions change. Keep the "Last Updated" date current.
 
@@ -73,6 +73,7 @@ commitlint.config.cjs  # Commit message linting
 - TypeScript `strict` enabled; keep types tight.
 - Prefer functional components; co-locate simple UI in routes, extract shared UI to `src/components/`.
 - Use Chakra UI components and style props; avoid custom CSS unless necessary.
+- **JSX Props:** Alphabetize component props alphabetically by name (e.g., `<Heading as="h1" color={...} fontSize={...} fontWeight={...}>`). Apply this to all components for consistency.
 - Favor readable code; add brief comments only for non-obvious logic.
 - For navigation, use `Link` from TanStack Router (see `Header`).
 

@@ -10,19 +10,19 @@ function App() {
   const secondaryText = useColorModeValue('gray.600', 'gray.400')
 
   return (
-    <Box minH="100vh" bg={bgColor} color={textColor}>
-      <Box as="section" py={20} px={6}>
+    <Box bg={bgColor} color={textColor} minH="100vh">
+      <Box as="section" px={6} py={20}>
         <Container maxW="4xl">
-          <VStack gap={8} align="center" textAlign="center">
+          <VStack align="center" gap={8} textAlign="center">
             <Heading
               as="h1"
+              color={textColor}
               fontSize={{ base: '4xl', md: '5xl' }}
               fontWeight="bold"
-              color={textColor}
             >
               Welcome to checkPAD
             </Heading>
-            <Text fontSize="lg" color={secondaryText} maxW="2xl">
+            <Text color={secondaryText} fontSize="lg" maxW="2xl">
               Aircraft Maintenance Management System
             </Text>
             <Text fontSize="md" color={secondaryText} maxW="2xl" mb={4}>

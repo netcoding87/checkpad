@@ -12,8 +12,8 @@ export const Route = createRootRoute({
         charSet: 'utf-8',
       },
       {
-        name: 'viewport',
         content: 'width=device-width, initial-scale=1',
+        name: 'viewport',
       },
       {
         title: 'checkPAD - Aircraft Maintenance Management',
@@ -21,9 +21,9 @@ export const Route = createRootRoute({
     ],
     links: [
       {
+        href: '/favicon.svg',
         rel: 'icon',
         type: 'image/svg+xml',
-        href: '/favicon.svg',
       },
     ],
   }),

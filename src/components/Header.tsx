@@ -25,31 +25,31 @@ export default function Header() {
       py={4}
       shadow="sm"
     >
-      <Flex justify="space-between" align="center">
-        <Link to="/" style={{ textDecoration: 'none' }}>
+      <Flex align="center" justify="space-between">
+        <Link style={{ textDecoration: 'none' }} to="/">
           <Flex
+            _hover={{ opacity: 0.75 }}
             align="center"
             gap={3}
-            _hover={{ opacity: 0.75 }}
             transition="opacity 0.2s"
           >
-            <Plane size={32} color="#06b6d4" />
-            <Heading as="h1" size="lg" fontWeight="bold" color={textColor}>
+            <Plane color="#06b6d4" size={32} />
+            <Heading as="h1" color={textColor} fontWeight="bold" size="lg">
               checkPAD
             </Heading>
           </Flex>
         </Link>
         <IconButton
-          onClick={toggleColorMode}
           aria-label="Toggle theme"
-          variant="ghost"
-          size="md"
           color={textColor}
+          onClick={toggleColorMode}
+          size="md"
+          variant="ghost"
         >
           {mounted && colorMode === 'dark' ? (
-            <Sun size={24} color="#fbbf24" />
+            <Sun color="#fbbf24" size={24} />
           ) : (
-            <Moon size={24} color="#64748b" />
+            <Moon color="#64748b" size={24} />
           )}
         </IconButton>
       </Flex>

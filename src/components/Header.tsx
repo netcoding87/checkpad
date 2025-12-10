@@ -6,7 +6,9 @@ import { useColorMode, useColorModeValue } from './ui/color-mode'
 
 export default function Header() {
   const { colorMode, toggleColorMode } = useColorMode()
-  const headerBg = useColorModeValue('gray.800', 'gray.900')
+  const headerBg = useColorModeValue('white', 'gray.900')
+  const headerBorder = useColorModeValue('gray.200', 'gray.800')
+  const textColor = useColorModeValue('gray.900', 'white')
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -14,17 +16,25 @@ export default function Header() {
   }, [])
 
   return (
-    <Box as="header" bg={headerBg} color="white" px={4} py={4} shadow="lg">
+    <Box
+      as="header"
+      bg={headerBg}
+      borderBottom="2px"
+      borderColor={headerBorder}
+      px={6}
+      py={4}
+      shadow="sm"
+    >
       <Flex justify="space-between" align="center">
         <Link to="/" style={{ textDecoration: 'none' }}>
           <Flex
             align="center"
             gap={3}
-            _hover={{ opacity: 0.8 }}
+            _hover={{ opacity: 0.75 }}
             transition="opacity 0.2s"
           >
-            <Plane size={32} color="#22d3ee" />
-            <Heading as="h1" size="xl" fontWeight="bold">
+            <Plane size={32} color="#06b6d4" />
+            <Heading as="h1" size="lg" fontWeight="bold" color={textColor}>
               checkPAD
             </Heading>
           </Flex>
@@ -33,7 +43,8 @@ export default function Header() {
           onClick={toggleColorMode}
           aria-label="Toggle theme"
           variant="ghost"
-          colorPalette="gray"
+          size="md"
+          color={textColor}
         >
           {mounted && colorMode === 'dark' ? (
             <Sun size={24} color="#fbbf24" />

@@ -33,12 +33,12 @@ export const Route = createRootRoute({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <Provider>
+    <Provider>
+      <html lang="en">
+        <head>
+          <HeadContent />
+        </head>
+        <body style={{ margin: 0, padding: 0 }}>
           <Header />
           {children}
           <TanStackDevtools
@@ -52,9 +52,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
               },
             ]}
           />
-        </Provider>
-        <Scripts />
-      </body>
-    </html>
+          <Scripts />
+        </body>
+      </html>
+    </Provider>
   )
 }

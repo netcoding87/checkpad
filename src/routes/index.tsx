@@ -1,54 +1,35 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Plane } from 'lucide-react'
-import { Box, Container, Flex, Heading, Text } from '@chakra-ui/react'
+import { Box, Container, Heading, Text, VStack } from '@chakra-ui/react'
+import { useColorModeValue } from '@/components/ui/color-mode'
 
 export const Route = createFileRoute('/')({ component: App })
 
 function App() {
+  const bgColor = useColorModeValue('gray.50', 'gray.900')
+  const textColor = useColorModeValue('gray.900', 'white')
+  const secondaryText = useColorModeValue('gray.600', 'gray.400')
+
   return (
-    <Box
-      minH="100vh"
-      bgGradient="to-b"
-      gradientFrom="gray.900"
-      gradientVia="gray.800"
-      gradientTo="gray.900"
-    >
-      <Box as="section" position="relative" py={20} px={6} textAlign="center">
-        <Box
-          position="absolute"
-          inset={0}
-          bgGradient="to-r"
-          gradientFrom="cyan.500/10"
-          gradientVia="blue.500/10"
-          gradientTo="purple.500/10"
-        />
-        <Container maxW="5xl" position="relative">
-          <Flex justify="center" align="center" gap={6} mb={6}>
-            <Plane size={128} color="#22d3ee" />
+    <Box minH="100vh" bg={bgColor} color={textColor}>
+      <Box as="section" py={20} px={6}>
+        <Container maxW="4xl">
+          <VStack gap={8} align="center" textAlign="center">
             <Heading
               as="h1"
-              fontSize={{ base: '6xl', md: '7xl' }}
-              fontWeight="black"
-              bgGradient="to-r"
-              gradientFrom="cyan.400"
-              gradientTo="blue.400"
-              bgClip="text"
+              fontSize={{ base: '4xl', md: '5xl' }}
+              fontWeight="bold"
+              color={textColor}
             >
-              checkPAD
+              Welcome to checkPAD
             </Heading>
-          </Flex>
-          <Text
-            fontSize={{ base: '2xl', md: '3xl' }}
-            color="gray.300"
-            mb={4}
-            fontWeight="light"
-          >
-            Aircraft Maintenance Management System
-          </Text>
-          <Text fontSize="lg" color="gray.400" maxW="3xl" mx="auto" mb={8}>
-            Streamline your aircraft maintenance operations with comprehensive
-            tracking, invoice management, and regulatory compliance tools.
-          </Text>
+            <Text fontSize="lg" color={secondaryText} maxW="2xl">
+              Aircraft Maintenance Management System
+            </Text>
+            <Text fontSize="md" color={secondaryText} maxW="2xl" mb={4}>
+              Streamline your aircraft maintenance operations with comprehensive
+              tracking, invoice management, and regulatory compliance tools.
+            </Text>
+          </VStack>
         </Container>
       </Box>
     </Box>

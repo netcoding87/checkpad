@@ -245,7 +245,6 @@ export const todos = pgTable('todos', {
 
 ```tsx
 import { Link } from '@tanstack/react-router'
-
 ;<Link to="/about">About</Link>
 ```
 

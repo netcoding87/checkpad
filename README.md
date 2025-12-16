@@ -229,7 +229,6 @@ src/routes/
 
 ```tsx
 import { Link } from '@tanstack/react-router'
-
 ;<Link to="/about">About</Link>
 ```
 

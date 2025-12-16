@@ -1,4 +1,9 @@
 {
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": [
+    "source.organizeImports",
+    "source.fixAll.eslint"
+  ],
   "files.watcherExclude": {
     "**/routeTree.gen.ts": true
   },
@@ -7,5 +12,5 @@
   },
   "files.readonlyInclude": {
     "**/routeTree.gen.ts": true
-  }
+  },
 }

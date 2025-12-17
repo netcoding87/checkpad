@@ -1,5 +1,6 @@
 import { createRootRouteWithContext } from '@tanstack/react-router'
 
+import { NotFoundPage } from '@/components/core/NotFoundPage'
 import { RootDocument } from '@/components/core/Root'
 
 export const Route = createRootRouteWithContext()({
@@ -26,4 +27,5 @@ export const Route = createRootRouteWithContext()({
   }),
 
   shellComponent: RootDocument,
+  notFoundComponent: NotFoundPage,
 })

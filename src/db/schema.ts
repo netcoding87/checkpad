@@ -1,4 +1,5 @@
 import {
+  index,
   jsonb,
   numeric,
   pgTable,
@@ -8,30 +9,38 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core'
 
-export const maintenanceCases = pgTable('maintenance_cases', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  name: text('name').notNull(),
-  estimatedHours: numeric('estimated_hours', { precision: 10, scale: 2 }),
-  estimatedCosts: numeric('estimated_costs', { precision: 12, scale: 2 }),
-  plannedStart: timestamp('planned_start'),
-  plannedEnd: timestamp('planned_end'),
-  offerCreatedBy: text('offer_created_by'),
-  offerCreatedAt: timestamp('offer_created_at'),
-  offerAcceptedAt: timestamp('offer_accepted_at'),
-  invoiceCreatedBy: text('invoice_created_by'),
-  invoiceCreatedAt: timestamp('invoice_created_at'),
-  invoicePaidAt: timestamp('invoice_paid_at'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-})
+export const maintenanceCasesTable = pgTable(
+  'maintenance_cases',
+  {
+    id: uuid().defaultRandom().primaryKey(),
+    name: text().notNull(),
+    estimatedHours: numeric({ precision: 10, scale: 2 }),
+    estimatedCosts: numeric({ precision: 12, scale: 2 }),
+    plannedStart: timestamp(),
+    plannedEnd: timestamp(),
+    offerCreatedBy: text(),
+    offerCreatedAt: timestamp(),
+    offerAcceptedAt: timestamp(),
+    invoiceCreatedBy: text(),
+    invoiceCreatedAt: timestamp(),
+    invoicePaidAt: timestamp(),
+    createdAt: timestamp().defaultNow().notNull(),
+    updatedAt: timestamp().defaultNow().notNull(),
+  },
+  (table) => [index('name_idx').on(table.name)],
+)
 
-export const auditLog = pgTable('audit_log', {
-  id: serial('id').primaryKey(),
-  tableName: text('table_name').notNull(),
-  recordId: uuid('record_id').notNull(),
-  columnName: text('column_name').notNull(),
-  oldValue: jsonb('old_value'),
-  newValue: jsonb('new_value'),
-  changedBy: text('changed_by'),
-  changedAt: timestamp('changed_at').defaultNow().notNull(),
-})
+export const auditLogTable = pgTable(
+  'audit_log',
+  {
+    id: serial().primaryKey(),
+    tableName: text().notNull(),
+    recordId: uuid().notNull(),
+    columnName: text().notNull(),
+    oldValue: jsonb(),
+    newValue: jsonb(),
+    changedBy: text(),
+    changedAt: timestamp().defaultNow().notNull(),
+  },
+  (table) => [index('record_id_idx').on(table.recordId)],
+)

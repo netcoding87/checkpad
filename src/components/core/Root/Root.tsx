@@ -4,17 +4,17 @@ import { Provider } from '@/components/ui/provider'
 
 export function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <Provider>
-      <html lang="en">
-        <head>
-          <HeadContent />
-        </head>
-        <body>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <Provider>
           <Header />
           {children}
           <Scripts />
-        </body>
-      </html>
-    </Provider>
+        </Provider>
+      </body>
+    </html>
   )
 }

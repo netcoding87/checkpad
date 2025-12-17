@@ -2,7 +2,7 @@ import { config } from 'dotenv'
 import { sql } from 'drizzle-orm'
 
 import { db } from '@/db'
-import { maintenanceCases } from '@/db/schema'
+import { maintenanceCasesTable } from '@/db/schema'
 
 config()
 
@@ -121,7 +121,7 @@ async function main() {
       sql`TRUNCATE TABLE audit_log, maintenance_cases RESTART IDENTITY CASCADE`,
     )
     await tx.execute(sql.raw(`SET LOCAL "app.current_user" = '${seedUser}'`))
-    await tx.insert(maintenanceCases).values(cases)
+    await tx.insert(maintenanceCasesTable).values(cases)
   })
 
   console.log(`Seeded ${cases.length} maintenance cases`)

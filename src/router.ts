@@ -6,8 +6,9 @@ import { routeTree } from './routeTree.gen'
 // Create a new router instance
 export const getRouter = () => {
   const router = createRouter({
-    routeTree,
     defaultPreload: 'intent',
+    routeTree,
+    scrollRestoration: true,
   })
 
   return router

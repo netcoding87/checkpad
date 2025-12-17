@@ -287,7 +287,7 @@ The previous `todos` table has been removed in favor of maintenance case trackin
 **Audit Triggers:**
 
 - `maintenance_cases` uses Postgres triggers to log INSERT/UPDATE/DELETE into `audit_log` (see `drizzle/0001_add_maintenance_cases_audit_triggers.sql`).
-- Set `app.current_user` in the session (e.g., `SET LOCAL app.current_user = '<user-id>';`) so `changedBy` is populated in audit rows.
+- Set `app.current_user` in the session (e.g., `SET LOCAL "app.current_user" = '<user-id>';`) so `changedBy` is populated in audit rows.
 
 ### Migration Workflow
 
@@ -302,6 +302,15 @@ npm run db:migrate   # Production (run migrations)
 # 3. Open Drizzle Studio (optional)
 npm run db:studio
 ```
+
+### Seeding
+
+```bash
+npm run db:seed
+```
+
+- Truncates `maintenance_cases` and `audit_log`, then inserts sample maintenance cases.
+- Sets `app.current_user` to `seed-script` during inserts so audit rows capture the actor.
 
 ### Database Tools
 

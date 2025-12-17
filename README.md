@@ -406,6 +406,11 @@ import { Dashboard } from '@/components/maintenance/Dashboard'
 import { Dashboard } from '../../components/maintenance/Dashboard'
 ```
 
+### React Conventions
+
+- **JSX props ordering**: Sort JSX props alphabetically for readability. Place spread props (`{...props}`) last to maintain override semantics. This is a non-functional style convention.
+- **Exception**: Do not change prop ordering within vendor snippets under `src/components/ui/` (Chakra UI-derived). These are kept identical to upstream.
+
 ---
 
 ## 🚢 Deployment

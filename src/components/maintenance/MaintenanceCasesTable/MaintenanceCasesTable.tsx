@@ -44,13 +44,13 @@ export function MaintenanceCasesTable() {
 
       <Box
         bg="bg.panel"
-        borderWidth="1px"
         borderColor="border"
+        borderWidth="1px"
         rounded="lg"
         shadow="sm"
       >
         <Table.ScrollArea>
-          <Table.Root variant="line" size="md">
+          <Table.Root size="md" variant="line">
             <Table.Header>
               <Table.Row>
                 <Table.ColumnHeader>Name</Table.ColumnHeader>
@@ -79,7 +79,7 @@ export function MaintenanceCasesTable() {
                     return (
                       <Table.Row key={maintenanceCase.id}>
                         <Table.Cell maxW="sm">
-                          <Text lineClamp={1} fontWeight="medium">
+                          <Text fontWeight="medium" lineClamp={1}>
                             {maintenanceCase.name}
                           </Text>
                         </Table.Cell>
@@ -113,9 +113,9 @@ export function MaintenanceCasesTable() {
                         </Table.Cell>
                         <Table.Cell>
                           <Badge
-                            variant="subtle"
                             colorPalette={status.colorScheme}
                             rounded="md"
+                            variant="subtle"
                           >
                             {status.label}
                           </Badge>

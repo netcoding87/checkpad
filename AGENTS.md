@@ -176,6 +176,8 @@ import { Component } from '../../components/ui/component'
 - **Hooks:** Use TanStack hooks for forms, tables, router
 - **Styling:** Chakra UI components only
 - **Theme:** Dark/light mode via `next-themes`
+- **JSX props ordering:** Alphabetize JSX props within components. Keep spread props (`{...props}`) last to preserve override behavior. Do not change logic; only reorder attributes.
+- **Exception:** Do not modify prop ordering in vendor snippets under `src/components/ui/` (Chakra UI-derived). Keep them as-is to match upstream behavior.
 
 ---
 

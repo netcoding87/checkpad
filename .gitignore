@@ -1,13 +1,35 @@
-node_modules
-.DS_Store
-dist
-dist-ssr
-*.local
-count.txt
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# .env files are used to store environment variables
+# like secrets that do not belong into source control
+# usually they are copied from .env.example files and
+# changed accordingly
 .env
+.env.development
+
+# dependencies
+/node_modules
+
+# testing
+/coverage
+/html
+
+# playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# production
+/dist
+/dist-ssr
+
+# misc
+.DS_Store
 .nitro
 .tanstack
 .wrangler
 .output
 .vinxi
+*.local
 todos.json

@@ -56,10 +56,11 @@ checkpad/
 ├── src/
 │   ├── routes/              # File-based routing (.ts files only)
 │   │   ├── __root.ts        # Root route with layout
+│   │   ├── hangar.ts        # Hangar calendar route
 │   │   └── index.ts         # Home page route
 │   ├── components/
 │   │   ├── core/            # Application shell (Header, Root)
-│   │   ├── maintenance/     # Feature modules (Dashboard, etc.)
+│   │   ├── maintenance/     # Feature modules (Dashboard, Hangar calendar)
 │   │   └── ui/              # Chakra UI providers & primitives
 │   ├── db/
 │   │   ├── schema.ts        # Drizzle database schema
@@ -197,8 +198,14 @@ Routes are defined as **TypeScript files** (`.ts`, not `.tsx`) in `src/routes/`:
 ```
 src/routes/
 ├── __root.ts          # Root layout
+├── hangar.ts          # Hangar calendar view
 └── index.ts           # Home page (/)
 ```
+
+**Current Pages**:
+
+- `/` Dashboard with maintenance cases table
+- `/hangar` Hangar view showing maintenance cases on a full-year calendar
 
 ### Adding a New Route
 
@@ -245,7 +252,7 @@ Define your schema in `src/db/schema.ts` using Drizzle ORM:
 ```typescript
 import {
   jsonb,
-  numeric,
+  doublePrecision,
   pgTable,
   serial,
   text,
@@ -256,8 +263,10 @@ import {
 export const maintenanceCases = pgTable('maintenance_cases', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
-  estimatedHours: numeric('estimated_hours', { precision: 10, scale: 2 }),
-  estimatedCosts: numeric('estimated_costs', { precision: 12, scale: 2 }),
+  // Note: `estimatedHours` and `estimatedCosts` use DOUBLE PRECISION
+  // to map to `number` on the TypeScript side.
+  estimatedHours: doublePrecision('estimated_hours'),
+  estimatedCosts: doublePrecision('estimated_costs'),
   plannedStart: timestamp('planned_start'),
   plannedEnd: timestamp('planned_end'),
   offerCreatedBy: text('offer_created_by'),

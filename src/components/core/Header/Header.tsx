@@ -1,7 +1,7 @@
 import { Box, Flex, HStack, Heading, IconButton } from '@chakra-ui/react'
 import { Link } from '@tanstack/react-router'
 import { Moon, Plane, Sun } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useColorMode, useColorModeValue } from '@/components/ui/color-mode'
 
 export function Header() {
@@ -16,6 +16,14 @@ export function Header() {
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  const navItems = useMemo(
+    () => [
+      { label: 'Dashboard', to: '/' },
+      { label: 'Hangar', to: '/hangar' },
+    ],
+    [],
+  )
 
   return (
     <Box
@@ -46,38 +54,28 @@ export function Header() {
             </Flex>
           </Link>
           <HStack as="nav" gap={2}>
-            <Link style={{ textDecoration: 'none' }} to="/">
-              {({ isActive }) => (
-                <Box
-                  _hover={{ bg: linkHoverBg }}
-                  bg={isActive ? activeLinkBg : 'transparent'}
-                  borderRadius="md"
-                  color={textColor}
-                  fontWeight={isActive ? 'semibold' : 'medium'}
-                  px={4}
-                  py={2}
-                  transition="background 0.2s"
-                >
-                  Home
-                </Box>
-              )}
-            </Link>
-            <Link style={{ textDecoration: 'none' }} to="/">
-              {({ isActive }) => (
-                <Box
-                  _hover={{ bg: linkHoverBg }}
-                  bg={isActive ? activeLinkBg : 'transparent'}
-                  borderRadius="md"
-                  color={textColor}
-                  fontWeight={isActive ? 'semibold' : 'medium'}
-                  px={4}
-                  py={2}
-                  transition="background 0.2s"
-                >
-                  Dashboard
-                </Box>
-              )}
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.to}
+                style={{ textDecoration: 'none' }}
+                to={item.to}
+              >
+                {({ isActive }) => (
+                  <Box
+                    _hover={{ bg: linkHoverBg }}
+                    bg={isActive ? activeLinkBg : 'transparent'}
+                    borderRadius="md"
+                    color={textColor}
+                    fontWeight={isActive ? 'semibold' : 'medium'}
+                    px={4}
+                    py={2}
+                    transition="background 0.2s"
+                  >
+                    {item.label}
+                  </Box>
+                )}
+              </Link>
+            ))}
           </HStack>
         </Flex>
         <IconButton

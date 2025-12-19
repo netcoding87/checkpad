@@ -1,7 +1,7 @@
 import {
+  doublePrecision,
   index,
   jsonb,
-  numeric,
   pgTable,
   serial,
   text,
@@ -14,10 +14,10 @@ export const maintenanceCasesTable = pgTable(
   {
     id: uuid().defaultRandom().primaryKey(),
     name: text().notNull(),
-    estimatedHours: numeric({ precision: 10, scale: 2 }),
-    estimatedCosts: numeric({ precision: 12, scale: 2 }),
-    plannedStart: timestamp(),
-    plannedEnd: timestamp(),
+    estimatedHours: doublePrecision(),
+    estimatedCosts: doublePrecision(),
+    plannedStart: timestamp().notNull(),
+    plannedEnd: timestamp().notNull(),
     offerCreatedBy: text(),
     offerCreatedAt: timestamp(),
     offerAcceptedAt: timestamp(),

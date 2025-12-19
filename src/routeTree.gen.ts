@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as HangarRouteImport } from './routes/hangar'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiMaintenanceCasesRouteImport } from './routes/api/maintenance-cases'
 
+const HangarRoute = HangarRouteImport.update({
+  id: '/hangar',
+  path: '/hangar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -25,32 +31,43 @@ const ApiMaintenanceCasesRoute = ApiMaintenanceCasesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/hangar': typeof HangarRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/hangar': typeof HangarRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/hangar': typeof HangarRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/maintenance-cases'
+  fullPaths: '/' | '/hangar' | '/api/maintenance-cases'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/maintenance-cases'
-  id: '__root__' | '/' | '/api/maintenance-cases'
+  to: '/' | '/hangar' | '/api/maintenance-cases'
+  id: '__root__' | '/' | '/hangar' | '/api/maintenance-cases'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  HangarRoute: typeof HangarRoute
   ApiMaintenanceCasesRoute: typeof ApiMaintenanceCasesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/hangar': {
+      id: '/hangar'
+      path: '/hangar'
+      fullPath: '/hangar'
+      preLoaderRoute: typeof HangarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  HangarRoute: HangarRoute,
   ApiMaintenanceCasesRoute: ApiMaintenanceCasesRoute,
 }
 export const routeTree = rootRouteImport

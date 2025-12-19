@@ -42,10 +42,11 @@ checkpad/
 ├── src/
 │   ├── routes/              # File-based routing (auto-generated route tree)
 │   │   ├── __root.ts        # Root route with layout
+│   │   ├── hangar.ts        # Hangar calendar route
 │   │   └── index.ts         # Home page route
 │   ├── components/
 │   │   ├── core/            # Core application components (Header, Root)
-│   │   ├── maintenance/     # Feature-specific components (Dashboard)
+│   │   ├── maintenance/     # Feature-specific components (Dashboard, Hangar calendar)
 │   │   └── ui/              # UI primitives and providers (Chakra UI)
 │   ├── db/
 │   │   ├── schema.ts        # Drizzle database schema
@@ -69,6 +70,7 @@ checkpad/
    - `ui/`: Reusable UI components and providers
 3. **Database-First:** Schema defined in `src/db/schema.ts`, migrations via Drizzle Kit
 4. **Local-First Sync:** ElectricSQL for real-time data synchronization
+5. **Hangar Calendar:** `/hangar` renders maintenance cases across the full year with `useLiveQuery(maintenanceCasesCollection)` and unique per-case coloring.
 
 ---
 
@@ -203,8 +205,10 @@ import {
 export const maintenanceCases = pgTable('maintenance_cases', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
-  estimatedHours: numeric('estimated_hours', { precision: 10, scale: 2 }),
-  estimatedCosts: numeric('estimated_costs', { precision: 12, scale: 2 }),
+  // Note: `estimatedHours` and `estimatedCosts` use DOUBLE PRECISION
+  // to map to `number` on the TypeScript side.
+  estimatedHours: doublePrecision('estimated_hours'),
+  estimatedCosts: doublePrecision('estimated_costs'),
   plannedStart: timestamp('planned_start'),
   plannedEnd: timestamp('planned_end'),
   offerCreatedBy: text('offer_created_by'),

@@ -77,8 +77,8 @@ describe.skip('MaintenanceCasesTable', () => {
       buildCase({
         id: '1',
         name: 'Test Case 1',
-        estimatedHours: '10.50',
-        estimatedCosts: '1500.00',
+        estimatedHours: 10.5,
+        estimatedCosts: 1500.0,
         plannedStart: new Date('2025-01-15').toISOString(),
         plannedEnd: new Date('2025-01-20').toISOString(),
         offerCreatedBy: 'John',
@@ -90,8 +90,10 @@ describe.skip('MaintenanceCasesTable', () => {
     await waitFor(() => {
       expect(screen.getByText('Test Case 1')).toBeInTheDocument()
     })
-    expect(screen.getByText('10.50')).toBeInTheDocument()
-    expect(screen.getByText('1500.00')).toBeInTheDocument()
+    expect(screen.getByText('10,50')).toBeInTheDocument()
+    // de-DE currency formatting typically yields a non-breaking space before the symbol
+    const costRegex = /1\.500,00\s?€/
+    expect(screen.getByText(costRegex)).toBeInTheDocument()
   })
 
   it('displays "Draft" status for cases without offer', async () => {

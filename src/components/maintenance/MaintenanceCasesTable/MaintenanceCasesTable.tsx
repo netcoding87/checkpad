@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react'
 import { useLiveQuery } from '@tanstack/react-db'
 import { maintenanceCasesCollection } from '@/db/collections'
+import { toCommercial } from '@/utils/number'
 
 function getStatus(maintenanceCase: {
   offerCreatedAt: Date | null
@@ -85,30 +86,36 @@ export function MaintenanceCasesTable() {
                         </Table.Cell>
                         <Table.Cell textAlign="end">
                           <Text color="fg.muted">
-                            {maintenanceCase.estimatedHours ?? '-'}
+                            {maintenanceCase.estimatedHours != null
+                              ? maintenanceCase.estimatedHours.toLocaleString(
+                                  'de-DE',
+                                  {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 2,
+                                  },
+                                )
+                              : '-'}
                           </Text>
                         </Table.Cell>
                         <Table.Cell textAlign="end">
                           <Text color="fg.muted">
-                            {maintenanceCase.estimatedCosts ?? '-'}
-                          </Text>
-                        </Table.Cell>
-                        <Table.Cell>
-                          <Text color="fg.muted">
-                            {maintenanceCase.plannedStart
-                              ? new Date(
-                                  maintenanceCase.plannedStart,
-                                ).toLocaleDateString()
+                            {maintenanceCase.estimatedCosts != null
+                              ? toCommercial(maintenanceCase.estimatedCosts)
                               : '-'}
                           </Text>
                         </Table.Cell>
                         <Table.Cell>
                           <Text color="fg.muted">
-                            {maintenanceCase.plannedEnd
-                              ? new Date(
-                                  maintenanceCase.plannedEnd,
-                                ).toLocaleDateString()
-                              : '-'}
+                            {new Date(
+                              maintenanceCase.plannedStart,
+                            ).toLocaleDateString()}
+                          </Text>
+                        </Table.Cell>
+                        <Table.Cell>
+                          <Text color="fg.muted">
+                            {new Date(
+                              maintenanceCase.plannedEnd,
+                            ).toLocaleDateString()}
                           </Text>
                         </Table.Cell>
                         <Table.Cell>

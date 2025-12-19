@@ -1,6 +1,6 @@
 {
-  "id": "ebd1b712-2345-459c-bf16-33eb0baaea23",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "1cf40db1-a6ac-403b-a514-301a81e93a20",
+  "prevId": "9c97204b-ce86-4359-a30a-c5327fddb7be",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -58,7 +58,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "record_id_idx": {
+          "name": "record_id_idx",
+          "columns": [
+            {
+              "expression": "record_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -85,27 +101,27 @@
         },
         "estimated_hours": {
           "name": "estimated_hours",
-          "type": "numeric(10, 2)",
+          "type": "double precision",
           "primaryKey": false,
           "notNull": false
         },
         "estimated_costs": {
           "name": "estimated_costs",
-          "type": "numeric(12, 2)",
+          "type": "double precision",
           "primaryKey": false,
           "notNull": false
         },
         "planned_start": {
           "name": "planned_start",
-          "type": "timestamp",
+          "type": "date",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "planned_end": {
           "name": "planned_end",
-          "type": "timestamp",
+          "type": "date",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "offer_created_by": {
           "name": "offer_created_by",
@@ -158,7 +174,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "name_idx": {
+          "name": "name_idx",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},

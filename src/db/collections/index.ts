@@ -20,6 +20,10 @@ export const maintenanceCasesCollection = createCollection(
       onError: (error) => {
         console.error('Error fetching maintenance cases:', error)
       },
+      parser: {
+        timestamp: (date: string) => new Date(date),
+        timestamptz: (date: string) => new Date(date),
+      },
       url: url('/api/maintenance-cases'),
     },
     schema: MaintenanceCaseSchema,

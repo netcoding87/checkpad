@@ -11,7 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as HangarRouteImport } from './routes/hangar'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiMaintenanceCasesRouteImport } from './routes/api/maintenance-cases'
+import { Route as HangarIndexRouteImport } from './routes/hangar.index'
+import { Route as HangarNewRouteImport } from './routes/hangar.new'
+import { Route as HangarCaseIdRouteImport } from './routes/hangar.$caseId'
+import { Route as ApiMaintenanceCasesRouteImport } from './routes/api.maintenance-cases'
+import { Route as ApiElectricMaintenanceCasesRouteImport } from './routes/api.electric.maintenance-cases'
 
 const HangarRoute = HangarRouteImport.update({
   id: '/hangar',
@@ -23,40 +27,94 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HangarIndexRoute = HangarIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => HangarRoute,
+} as any)
+const HangarNewRoute = HangarNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => HangarRoute,
+} as any)
+const HangarCaseIdRoute = HangarCaseIdRouteImport.update({
+  id: '/$caseId',
+  path: '/$caseId',
+  getParentRoute: () => HangarRoute,
+} as any)
 const ApiMaintenanceCasesRoute = ApiMaintenanceCasesRouteImport.update({
   id: '/api/maintenance-cases',
   path: '/api/maintenance-cases',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiElectricMaintenanceCasesRoute =
+  ApiElectricMaintenanceCasesRouteImport.update({
+    id: '/api/electric/maintenance-cases',
+    path: '/api/electric/maintenance-cases',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/hangar': typeof HangarRoute
+  '/hangar': typeof HangarRouteWithChildren
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
+  '/hangar/$caseId': typeof HangarCaseIdRoute
+  '/hangar/new': typeof HangarNewRoute
+  '/hangar/': typeof HangarIndexRoute
+  '/api/electric/maintenance-cases': typeof ApiElectricMaintenanceCasesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/hangar': typeof HangarRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
+  '/hangar/$caseId': typeof HangarCaseIdRoute
+  '/hangar/new': typeof HangarNewRoute
+  '/hangar': typeof HangarIndexRoute
+  '/api/electric/maintenance-cases': typeof ApiElectricMaintenanceCasesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/hangar': typeof HangarRoute
+  '/hangar': typeof HangarRouteWithChildren
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
+  '/hangar/$caseId': typeof HangarCaseIdRoute
+  '/hangar/new': typeof HangarNewRoute
+  '/hangar/': typeof HangarIndexRoute
+  '/api/electric/maintenance-cases': typeof ApiElectricMaintenanceCasesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/hangar' | '/api/maintenance-cases'
+  fullPaths:
+    | '/'
+    | '/hangar'
+    | '/api/maintenance-cases'
+    | '/hangar/$caseId'
+    | '/hangar/new'
+    | '/hangar/'
+    | '/api/electric/maintenance-cases'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/hangar' | '/api/maintenance-cases'
-  id: '__root__' | '/' | '/hangar' | '/api/maintenance-cases'
+  to:
+    | '/'
+    | '/api/maintenance-cases'
+    | '/hangar/$caseId'
+    | '/hangar/new'
+    | '/hangar'
+    | '/api/electric/maintenance-cases'
+  id:
+    | '__root__'
+    | '/'
+    | '/hangar'
+    | '/api/maintenance-cases'
+    | '/hangar/$caseId'
+    | '/hangar/new'
+    | '/hangar/'
+    | '/api/electric/maintenance-cases'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  HangarRoute: typeof HangarRoute
+  HangarRoute: typeof HangarRouteWithChildren
   ApiMaintenanceCasesRoute: typeof ApiMaintenanceCasesRoute
+  ApiElectricMaintenanceCasesRoute: typeof ApiElectricMaintenanceCasesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,6 +133,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/hangar/': {
+      id: '/hangar/'
+      path: '/'
+      fullPath: '/hangar/'
+      preLoaderRoute: typeof HangarIndexRouteImport
+      parentRoute: typeof HangarRoute
+    }
+    '/hangar/new': {
+      id: '/hangar/new'
+      path: '/new'
+      fullPath: '/hangar/new'
+      preLoaderRoute: typeof HangarNewRouteImport
+      parentRoute: typeof HangarRoute
+    }
+    '/hangar/$caseId': {
+      id: '/hangar/$caseId'
+      path: '/$caseId'
+      fullPath: '/hangar/$caseId'
+      preLoaderRoute: typeof HangarCaseIdRouteImport
+      parentRoute: typeof HangarRoute
+    }
     '/api/maintenance-cases': {
       id: '/api/maintenance-cases'
       path: '/api/maintenance-cases'
@@ -82,13 +161,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMaintenanceCasesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/electric/maintenance-cases': {
+      id: '/api/electric/maintenance-cases'
+      path: '/api/electric/maintenance-cases'
+      fullPath: '/api/electric/maintenance-cases'
+      preLoaderRoute: typeof ApiElectricMaintenanceCasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface HangarRouteChildren {
+  HangarCaseIdRoute: typeof HangarCaseIdRoute
+  HangarNewRoute: typeof HangarNewRoute
+  HangarIndexRoute: typeof HangarIndexRoute
+}
+
+const HangarRouteChildren: HangarRouteChildren = {
+  HangarCaseIdRoute: HangarCaseIdRoute,
+  HangarNewRoute: HangarNewRoute,
+  HangarIndexRoute: HangarIndexRoute,
+}
+
+const HangarRouteWithChildren =
+  HangarRoute._addFileChildren(HangarRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  HangarRoute: HangarRoute,
+  HangarRoute: HangarRouteWithChildren,
   ApiMaintenanceCasesRoute: ApiMaintenanceCasesRoute,
+  ApiElectricMaintenanceCasesRoute: ApiElectricMaintenanceCasesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

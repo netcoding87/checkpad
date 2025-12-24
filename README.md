@@ -44,7 +44,7 @@
 - **Local-First**: ElectricSQL enables offline-capable, real-time sync between client and server
 - **Server-Side Rendering**: TanStack Start provides RSC architecture for optimal performance
 - **Type Safety**: End-to-end TypeScript with strict mode enabled
-- **File-Based Routing**: Convention over configuration with auto-generated route trees
+- **File-Based Routing**: Flat file-based convention with auto-generated route trees
 - **Database-First**: Schema-driven development with Drizzle ORM migrations
 
 ---
@@ -189,23 +189,28 @@ function Example() {
 
 ## 🧭 Routing
 
-### File-Based Routing
+### Flat File-Based Routing
 
-Routes are defined as **TypeScript files** (`.ts`, not `.tsx`) in `src/routes/`:
+Routes use **flat file naming convention** (no nested directories):
 
-**Directory Structure**:
+**Naming Pattern:**
+
+```
+file.ts          → /file
+parent.child.ts  → /parent/child
+parent.$id.ts    → /parent/:id (dynamic segment)
+```
+
+**Current Routes**:
 
 ```
 src/routes/
-├── __root.ts          # Root layout
-├── hangar.ts          # Hangar calendar view
-└── index.ts           # Home page (/)
+├── __root.ts              # Root layout
+├── index.ts               # / (Dashboard with maintenance table)
+├── hangar.ts              # /hangar (Year calendar view)
+├── hangar.new.ts          # /hangar/new (Create case form)
+└── hangar.$caseId.ts      # /hangar/:caseId (Edit case form)
 ```
-
-**Current Pages**:
-
-- `/` Dashboard with maintenance cases table
-- `/hangar` Hangar view showing maintenance cases on a full-year calendar
 
 ### Adding a New Route
 
@@ -218,10 +223,10 @@ src/routes/
    }
    ```
 
-2. **Create the route file** (`.ts` only):
+2. **Create the route file** (flat naming, `.ts` only):
 
    ```typescript
-   // src/routes/about.ts
+   // src/routes/about.ts → /about
    import { createFileRoute } from '@tanstack/react-router'
    import { About } from '@/components/pages/About'
 
@@ -230,16 +235,27 @@ src/routes/
    })
    ```
 
-3. **Route tree updates automatically** - no manual configuration needed!
+3. **For nested routes, use dot notation**:
+
+   ```typescript
+   // src/routes/blog.posts.ts → /blog/posts
+   // src/routes/blog.$slug.ts → /blog/:slug
+   ```
+
+4. **Route tree updates automatically** - no manual configuration needed!
 
 ### Navigation
 
 ```tsx
 import { Link } from '@tanstack/react-router'
-;<Link to="/about">About</Link>
+
+// Navigate to routes
+<Link to="/hangar">Hangar</Link>
+<Link to="/hangar/new">New Case</Link>
+<Link to="/hangar/$caseId" params={{ caseId: '123' }}>Edit Case</Link>
 ```
 
-More: [TanStack Router Docs](https://tanstack.com/router)
+More: [TanStack Router Docs](https://tanstack.com/router) | [Flat Routes Guide](https://tanstack.com/router/latest/docs/framework/react/routing/file-based-routing#flat-routes)
 
 ---
 
@@ -357,6 +373,13 @@ function TodoList() {
 - Real-time updates across clients
 - Automatic conflict resolution
 - Local-first performance
+
+### API Endpoints
+
+- Reads (Electric proxy): `/api/electric/maintenance-cases`
+- Mutations (server DB with txid): `/api/maintenance-cases` (POST/PUT/DELETE)
+
+Collections are configured to read via the Electric proxy while mutations hit the app API, which writes to Postgres inside a transaction and returns the `txid` so the client can await sync.
 
 ---
 

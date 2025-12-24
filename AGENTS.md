@@ -20,7 +20,7 @@ This document serves as a living guide for AI agents working on the checkPAD pro
 - **Database:** PostgreSQL 18 (Alpine)
 - **ORM:** Drizzle ORM
 - **Styling:** Chakra UI v3
-- **Routing:** TanStack Router (file-based)
+- **Routing:** TanStack Router (flat file-based)
 - **State Management:** TanStack React DB, TanStack React Form, TanStack React Table
 - **Deployment:** Cloudflare Workers (via Wrangler)
 - **Runtime:** Node.js 24.12.0 (managed via Volta)
@@ -40,10 +40,12 @@ This document serves as a living guide for AI agents working on the checkPAD pro
 ```
 checkpad/
 ├── src/
-│   ├── routes/              # File-based routing (auto-generated route tree)
+│   ├── routes/              # Flat file-based routing (auto-generated route tree)
 │   │   ├── __root.ts        # Root route with layout
-│   │   ├── hangar.ts        # Hangar calendar route
-│   │   └── index.ts         # Home page route
+│   │   ├── index.ts         # Home page route (/)
+│   │   ├── hangar.ts        # Hangar calendar route (/hangar)
+│   │   ├── hangar.new.ts    # Create case route (/hangar/new)
+│   │   └── hangar.$caseId.ts # Edit case route (/hangar/:caseId)
 │   ├── components/
 │   │   ├── core/            # Core application components (Header, Root)
 │   │   ├── maintenance/     # Feature-specific components (Dashboard, Hangar calendar)
@@ -63,7 +65,11 @@ checkpad/
 
 ### Key Architectural Patterns
 
-1. **File-Based Routing:** Routes are defined as files in `src/routes/`. The route tree is auto-generated.
+1. **Flat File-Based Routing:** Routes are defined as files in `src/routes/` using flat naming convention:
+   - `filename.ts` → `/filename` route
+   - `parent.child.ts` → `/parent/child` route
+   - `parent.$paramId.ts` → `/parent/:paramId` dynamic route
+     The route tree is auto-generated.
 2. **Component Organization:**
    - `core/`: Application-level components
    - `maintenance/`: Feature modules
@@ -71,6 +77,11 @@ checkpad/
 3. **Database-First:** Schema defined in `src/db/schema.ts`, migrations via Drizzle Kit
 4. **Local-First Sync:** ElectricSQL for real-time data synchronization
 5. **Hangar Calendar:** `/hangar` renders maintenance cases across the full year with `useLiveQuery(maintenanceCasesCollection)` and unique per-case coloring.
+
+### Data API Endpoints
+
+- Reads (ElectricSQL proxy): `/api/electric/maintenance-cases`
+- Mutations (direct Postgres with txid): `/api/maintenance-cases` (POST/PUT/DELETE)
 
 ---
 
@@ -287,6 +298,11 @@ The legacy `todos` table has been removed in favor of maintenance case tracking 
    ```
 
 4. Route tree updates automatically
+
+**Electric vs App API:**
+
+- Use `/api/electric/...` for ElectricSQL proxied reads (collections `shapeOptions.url`).
+- Use `/api/...` for app-owned mutations that return `{ txid }` (collections `onInsert/onUpdate/onDelete`).
 
 **Important:** Route files should be `.ts` files that import components from `src/components/`, not `.tsx` files with inline components.
 

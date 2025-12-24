@@ -15,6 +15,49 @@ export type MaintenanceCase = z.infer<typeof MaintenanceCaseSchema>
 export const maintenanceCasesCollection = createCollection(
   electricCollectionOptions({
     getKey: (item) => item.id,
+    onDelete: async ({ transaction }) => {
+      const deletedItem = transaction.mutations[0].original
+
+      const response = await fetch('/api/maintenance-cases', {
+        body: JSON.stringify({ id: deletedItem.id }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'DELETE',
+      })
+
+      const { txid } = await response.json()
+
+      // Return txid to wait for sync
+      return { txid }
+    },
+    onInsert: async ({ transaction }) => {
+      const newItem = transaction.mutations[0].modified
+
+      const response = await fetch('/api/maintenance-cases', {
+        body: JSON.stringify(newItem),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+      })
+
+      const { txid } = await response.json()
+
+      // Return txid to wait for sync
+      return { txid }
+    },
+    onUpdate: async ({ transaction }) => {
+      const { original, modified } = transaction.mutations[0]
+
+      const { id: _discardId, ...updates } = modified
+      const response = await fetch('/api/maintenance-cases', {
+        body: JSON.stringify({ id: original.id, ...updates }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PUT',
+      })
+
+      const { txid } = await response.json()
+
+      // Return txid to wait for sync
+      return { txid }
+    },
     shapeOptions: {
       columnMapper: snakeCamelMapper(),
       onError: (error) => {
@@ -24,7 +67,7 @@ export const maintenanceCasesCollection = createCollection(
         timestamp: (date: string) => new Date(date),
         timestamptz: (date: string) => new Date(date),
       },
-      url: url('/api/maintenance-cases'),
+      url: url('/api/electric/maintenance-cases'),
     },
     schema: MaintenanceCaseSchema,
   }),

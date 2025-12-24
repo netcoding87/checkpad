@@ -11,7 +11,7 @@ const serve = async ({ request }: { request: Request }) => {
   return proxyElectricRequest(originUrl)
 }
 
-export const Route = createFileRoute('/api/maintenance-cases')({
+export const Route = createFileRoute('/api/electric/maintenance-cases')({
   server: {
     handlers: {
       GET: serve,

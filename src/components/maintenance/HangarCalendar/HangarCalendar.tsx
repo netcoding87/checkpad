@@ -12,7 +12,8 @@ import {
   useBreakpointValue,
 } from '@chakra-ui/react'
 import { gte, lte, useLiveQuery } from '@tanstack/react-db'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { MaintenanceCase } from '@/db/collections'
 import { maintenanceCasesCollection } from '@/db/collections'
@@ -125,8 +126,6 @@ export function HangarCalendar() {
     [year],
   )
 
-  console.log(maintenanceCases)
-
   const months = useMemo(() => buildMonths(year), [year])
   const totalDaysInYear = useMemo(
     () => months.reduce((total, month) => total + month.days, 0),
@@ -215,30 +214,38 @@ export function HangarCalendar() {
       <Stack gap={6}>
         <HStack justify="space-between">
           <Heading size="xl">Hangar</Heading>
-          <HStack gap={2}>
-            <IconButton
-              aria-label="Previous year"
-              onClick={() => setYear((value) => value - 1)}
-              size="sm"
-              variant="ghost"
-            >
-              <ChevronLeft size={18} />
-            </IconButton>
-            <Button
-              onClick={() => setYear(currentYear)}
-              size="sm"
-              variant="outline"
-            >
-              {year}
+          <HStack gap={3}>
+            <HStack gap={2}>
+              <IconButton
+                aria-label="Previous year"
+                onClick={() => setYear((value) => value - 1)}
+                size="sm"
+                variant="ghost"
+              >
+                <ChevronLeft size={18} />
+              </IconButton>
+              <Button
+                onClick={() => setYear(currentYear)}
+                size="sm"
+                variant="outline"
+              >
+                {year}
+              </Button>
+              <IconButton
+                aria-label="Next year"
+                onClick={() => setYear((value) => value + 1)}
+                size="sm"
+                variant="ghost"
+              >
+                <ChevronRight size={18} />
+              </IconButton>
+            </HStack>
+            <Button asChild colorPalette="blue" size="sm">
+              <Link to="/hangar/new">
+                <Plus size={16} />
+                Neuer Eintrag
+              </Link>
             </Button>
-            <IconButton
-              aria-label="Next year"
-              onClick={() => setYear((value) => value + 1)}
-              size="sm"
-              variant="ghost"
-            >
-              <ChevronRight size={18} />
-            </IconButton>
           </HStack>
         </HStack>
 
@@ -287,26 +294,35 @@ export function HangarCalendar() {
                       <Box
                         alignItems="center"
                         as="li"
+                        cursor="pointer"
                         display="flex"
                         gap={3}
                         key={maintenanceCase.id}
                         minHeight={`${caseRowHeight}px`}
                         px={{ base: 2, sm: 4 }}
+                        transition="background 0.2s"
+                        _hover={{ bg: 'bg.muted' }}
+                        asChild
                       >
-                        <Box
-                          aria-hidden
-                          bg={maintenanceCase.color}
-                          borderRadius="full"
-                          height="10px"
-                          minW="10px"
-                        />
-                        <Text
-                          fontWeight="medium"
-                          lineClamp={1}
-                          title={maintenanceCase.name}
+                        <Link
+                          to="/hangar/$caseId"
+                          params={{ caseId: maintenanceCase.id }}
                         >
-                          {maintenanceCase.name}
-                        </Text>
+                          <Box
+                            aria-hidden
+                            bg={maintenanceCase.color}
+                            borderRadius="full"
+                            height="10px"
+                            minW="10px"
+                          />
+                          <Text
+                            fontWeight="medium"
+                            lineClamp={1}
+                            title={maintenanceCase.name}
+                          >
+                            {maintenanceCase.name}
+                          </Text>
+                        </Link>
                       </Box>
                     ))}
                   </Box>
@@ -427,9 +443,11 @@ export function HangarCalendar() {
 
                           {maintenanceCase.range ? (
                             <Box
+                              asChild
                               bg={maintenanceCase.color}
                               borderRadius="md"
                               color="white"
+                              cursor="pointer"
                               fontSize="sm"
                               fontWeight="semibold"
                               left={`${maintenanceCase.range.startIndex * columnWidth}px`}
@@ -445,10 +463,17 @@ export function HangarCalendar() {
                               title={maintenanceCase.name}
                               top="50%"
                               transform="translateY(-50%)"
+                              transition="opacity 0.2s"
                               whiteSpace="nowrap"
                               width={`${(maintenanceCase.range.endIndex - maintenanceCase.range.startIndex + 1) * columnWidth}px`}
+                              _hover={{ opacity: 0.9 }}
                             >
-                              {maintenanceCase.name}
+                              <Link
+                                to="/hangar/$caseId"
+                                params={{ caseId: maintenanceCase.id }}
+                              >
+                                {maintenanceCase.name}
+                              </Link>
                             </Box>
                           ) : null}
                         </Box>

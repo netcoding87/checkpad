@@ -1,7 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { HangarCalendar } from '@/components/maintenance/HangarCalendar'
+import { Outlet, createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/hangar')({
-  component: HangarCalendar,
+  component: Outlet,
   ssr: false,
 })

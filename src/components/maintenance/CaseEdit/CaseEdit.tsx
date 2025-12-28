@@ -36,11 +36,26 @@ export function CaseEdit() {
       title: 'Wartungsfall aktualisiert',
       type: 'success',
     })
+  }
+
+  const handleCancel = () => {
+    navigate({ to: '/hangar' })
+  }
+
+  const handleDelete = () => {
+    if (!maintenanceCase) return
+
+    maintenanceCasesCollection.delete(maintenanceCase.id)
+
+    toaster.create({
+      title: 'Wartungsfall gelöscht',
+      type: 'success',
+    })
 
     navigate({ to: '/hangar' })
   }
 
-  const handleCancel = () => {
+  const handleSaveAndExit = () => {
     navigate({ to: '/hangar' })
   }
 
@@ -88,6 +103,8 @@ export function CaseEdit() {
               : null,
           }}
           onCancel={handleCancel}
+          onDelete={handleDelete}
+          onSaveAndExit={handleSaveAndExit}
           onSubmit={handleSubmit}
           submitLabel="Speichern"
         />

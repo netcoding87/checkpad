@@ -10,8 +10,9 @@ export function CaseNew() {
 
   const handleSubmit = (data: CaseFormData) => {
     try {
+      const caseId = crypto.randomUUID()
       maintenanceCasesCollection.insert({
-        id: crypto.randomUUID(),
+        id: caseId,
         name: data.name,
         plannedStart: data.plannedStart,
         plannedEnd: data.plannedEnd,
@@ -32,7 +33,7 @@ export function CaseNew() {
         type: 'success',
       })
 
-      navigate({ to: '/hangar' })
+      navigate({ to: '/hangar/$caseId', params: { caseId } })
     } catch (error) {
       console.error('Failed to create case:', error)
       toaster.create({

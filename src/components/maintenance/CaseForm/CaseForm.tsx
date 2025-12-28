@@ -1,5 +1,15 @@
-import { Button, Checkbox, Fieldset, Input, Stack } from '@chakra-ui/react'
+import {
+  Button,
+  ButtonGroup,
+  Checkbox,
+  Fieldset,
+  IconButton,
+  Input,
+  Menu,
+  Stack,
+} from '@chakra-ui/react'
 import { useForm } from '@tanstack/react-form'
+import { ChevronDown } from 'lucide-react'
 import type { CheckboxCheckedChangeDetails } from '@chakra-ui/react'
 import { Field } from '@/components/ui/field'
 
@@ -18,6 +28,8 @@ export type CaseFormData = {
 type CaseFormProps = {
   defaultValues?: Partial<CaseFormData>
   onCancel: () => void
+  onDelete?: () => void | Promise<void>
+  onSaveAndExit?: () => void | Promise<void>
   onSubmit: (data: CaseFormData) => void | Promise<void>
   submitLabel?: string
 }
@@ -25,6 +37,8 @@ type CaseFormProps = {
 export function CaseForm({
   defaultValues = {},
   onCancel,
+  onDelete,
+  onSaveAndExit,
   onSubmit,
   submitLabel = 'Speichern',
 }: CaseFormProps) {
@@ -45,6 +59,20 @@ export function CaseForm({
       await onSubmit(value)
     },
   })
+
+  const handleClose = () => {
+    if (form.state.isDirty) {
+      if (
+        confirm(
+          'Sie haben ungespeicherte Änderungen. Möchten Sie wirklich schließen?',
+        )
+      ) {
+        onCancel()
+      }
+    } else {
+      onCancel()
+    }
+  }
 
   return (
     <form
@@ -243,13 +271,67 @@ export function CaseForm({
           </Fieldset.Content>
         </Fieldset.Root>
 
-        <Stack direction="row" gap={3} justify="flex-end">
-          <Button onClick={onCancel} type="button" variant="ghost">
-            Abbrechen
-          </Button>
-          <Button colorPalette="blue" type="submit">
-            {submitLabel}
-          </Button>
+        <Stack direction="row" gap={3} justify="space-between">
+          <Stack direction="row" gap={3}>
+            {onDelete && (
+              <Button
+                colorPalette="red"
+                onClick={async () => {
+                  if (
+                    confirm(
+                      'Sind Sie sicher, dass Sie diesen Wartungsfall löschen möchten?',
+                    )
+                  ) {
+                    await onDelete()
+                  }
+                }}
+                type="button"
+                variant="ghost"
+              >
+                Löschen
+              </Button>
+            )}
+          </Stack>
+          <Stack direction="row" gap={3}>
+            <Button onClick={handleClose} type="button" variant="ghost">
+              Schließen
+            </Button>
+            <ButtonGroup colorPalette="blue" attached>
+              <Button
+                borderBottomRightRadius={0}
+                borderTopRightRadius={0}
+                type="submit"
+              >
+                {submitLabel}
+              </Button>
+              {onSaveAndExit && (
+                <Menu.Root positioning={{ placement: 'bottom-end' }}>
+                  <Menu.Trigger asChild>
+                    <IconButton
+                      aria-label="Mehr Optionen"
+                      borderBottomLeftRadius={0}
+                      borderTopLeftRadius={0}
+                    >
+                      <ChevronDown />
+                    </IconButton>
+                  </Menu.Trigger>
+                  <Menu.Positioner>
+                    <Menu.Content>
+                      <Menu.Item
+                        value="save-exit"
+                        onClick={async () => {
+                          await form.handleSubmit()
+                          await onSaveAndExit()
+                        }}
+                      >
+                        {submitLabel} und schließen
+                      </Menu.Item>
+                    </Menu.Content>
+                  </Menu.Positioner>
+                </Menu.Root>
+              )}
+            </ButtonGroup>
+          </Stack>
         </Stack>
       </Stack>
     </form>

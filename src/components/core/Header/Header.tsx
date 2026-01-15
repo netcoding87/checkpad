@@ -21,6 +21,7 @@ export function Header() {
     () => [
       { label: 'Dashboard', to: '/' },
       { label: 'Hangar', to: '/hangar' },
+      { label: 'Staff', to: '/staff' },
     ],
     [],
   )

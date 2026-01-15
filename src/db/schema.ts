@@ -1,6 +1,8 @@
 import {
+  boolean,
   doublePrecision,
   index,
+  integer,
   jsonb,
   pgTable,
   serial,
@@ -28,6 +30,26 @@ export const maintenanceCasesTable = pgTable(
     updatedAt: timestamp().defaultNow().notNull(),
   },
   (table) => [index('name_idx').on(table.name)],
+)
+
+export const staffTable = pgTable(
+  'staff',
+  {
+    id: uuid().defaultRandom().primaryKey(),
+    firstName: text().notNull(),
+    lastName: text().notNull(),
+    email: text().notNull().unique(),
+    phone: text(),
+    birthday: timestamp(),
+    hourlyRate: doublePrecision(),
+    vacationDaysTotal: integer().default(30),
+    vacationDaysUsed: integer().default(0),
+    sickDaysUsed: integer().default(0),
+    isActive: boolean().default(true),
+    createdAt: timestamp().defaultNow().notNull(),
+    updatedAt: timestamp().defaultNow().notNull(),
+  },
+  (table) => [index('email_idx').on(table.email)],
 )
 
 export const auditLogTable = pgTable(

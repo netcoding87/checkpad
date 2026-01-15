@@ -2,11 +2,84 @@ import { config } from 'dotenv'
 import { sql } from 'drizzle-orm'
 
 import { db } from '@/db'
-import { maintenanceCasesTable } from '@/db/schema'
+import { maintenanceCasesTable, staffTable } from '@/db/schema'
 
 config()
 
 const seedUser = 'seed-script'
+
+const staff = [
+  {
+    firstName: 'Julia',
+    lastName: 'Hartmann',
+    email: 'julia.hartmann@company.com',
+    phone: '+49-30-12345678',
+    birthday: new Date('1990-05-15'),
+    hourlyRate: 85.0,
+    vacationDaysTotal: 30,
+    vacationDaysUsed: 8,
+    sickDaysUsed: 2,
+    isActive: true,
+    createdAt: new Date('2024-01-15T10:00:00Z'),
+    updatedAt: new Date('2024-01-15T10:00:00Z'),
+  },
+  {
+    firstName: 'Marco',
+    lastName: 'Richter',
+    email: 'marco.richter@company.com',
+    phone: '+49-30-12345679',
+    birthday: new Date('1988-03-22'),
+    hourlyRate: 90.0,
+    vacationDaysTotal: 30,
+    vacationDaysUsed: 12,
+    sickDaysUsed: 1,
+    isActive: true,
+    createdAt: new Date('2024-01-20T10:00:00Z'),
+    updatedAt: new Date('2024-01-20T10:00:00Z'),
+  },
+  {
+    firstName: 'Svenja',
+    lastName: 'Vogel',
+    email: 'svenja.vogel@company.com',
+    phone: '+49-30-12345680',
+    birthday: new Date('1992-11-08'),
+    hourlyRate: 80.0,
+    vacationDaysTotal: 30,
+    vacationDaysUsed: 5,
+    sickDaysUsed: 0,
+    isActive: true,
+    createdAt: new Date('2024-02-01T10:00:00Z'),
+    updatedAt: new Date('2024-02-01T10:00:00Z'),
+  },
+  {
+    firstName: 'Anna',
+    lastName: 'Lenz',
+    email: 'anna.lenz@company.com',
+    phone: '+49-30-12345681',
+    birthday: new Date('1995-07-30'),
+    hourlyRate: 75.0,
+    vacationDaysTotal: 30,
+    vacationDaysUsed: 10,
+    sickDaysUsed: 3,
+    isActive: true,
+    createdAt: new Date('2024-02-10T10:00:00Z'),
+    updatedAt: new Date('2024-02-10T10:00:00Z'),
+  },
+  {
+    firstName: 'Thomas',
+    lastName: 'Schmidt',
+    email: 'thomas.schmidt@company.com',
+    phone: '+49-30-12345682',
+    birthday: new Date('1985-09-12'),
+    hourlyRate: 95.0,
+    vacationDaysTotal: 30,
+    vacationDaysUsed: 15,
+    sickDaysUsed: 0,
+    isActive: true,
+    createdAt: new Date('2024-03-05T10:00:00Z'),
+    updatedAt: new Date('2024-03-05T10:00:00Z'),
+  },
+]
 
 const cases = [
   {
@@ -118,13 +191,16 @@ const cases = [
 async function main() {
   await db.transaction(async (tx) => {
     await tx.execute(
-      sql`TRUNCATE TABLE audit_log, maintenance_cases RESTART IDENTITY CASCADE`,
+      sql`TRUNCATE TABLE audit_log, maintenance_cases, staff RESTART IDENTITY CASCADE`,
     )
     await tx.execute(sql.raw(`SET LOCAL "app.current_user" = '${seedUser}'`))
+    await tx.insert(staffTable).values(staff)
     await tx.insert(maintenanceCasesTable).values(cases)
   })
 
-  console.log(`Seeded ${cases.length} maintenance cases`)
+  console.log(
+    `Seeded ${staff.length} staff members and ${cases.length} maintenance cases`,
+  )
 }
 
 main().catch((error) => {

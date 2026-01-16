@@ -25,14 +25,8 @@ WORKDIR /app
 # Install dumb-init for proper signal handling
 RUN apk add --no-cache dumb-init
 
-# Copy built application from builder
+# Copy built application from builder (includes bundled dependencies)
 COPY --from=builder /app/.output ./.output
-
-# Copy package files for runtime dependencies
-COPY package.json package-lock.json ./
-
-# Install production dependencies only
-RUN npm ci --omit=dev
 
 # Expose the default port
 EXPOSE 3000

@@ -8,10 +8,7 @@ import { ELECTRIC_PROTOCOL_QUERY_PARAMS } from '@electric-sql/client'
  */
 export function prepareElectricUrl(requestUrl: string): URL {
   const url = new URL(requestUrl)
-  const electricUrl =
-    process.env.NODE_ENV === `production`
-      ? `http://localhost:3000`
-      : `http://localhost:3000`
+  const electricUrl = process.env.ELECTRIC_URL
   const originUrl = new URL(`${electricUrl}/v1/shape`)
 
   // Copy Electric-specific query params

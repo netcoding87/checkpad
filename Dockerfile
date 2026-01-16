@@ -22,21 +22,10 @@ FROM node:24.12.0-alpine
 
 WORKDIR /app
 
-# Install dumb-init for proper signal handling
-#RUN apk add --no-cache dumb-init
-
 # Copy built application from builder (includes bundled dependencies)
 COPY --from=builder /app/.output ./.output
 
 # Expose the default port
 EXPOSE 3000
 
-# Health check
-#HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-#  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
-
-# Use dumb-init to handle signals properly
-#ENTRYPOINT ["dumb-init", "--"]
-
-# Start the application
 CMD ["node", ".output/server/index.mjs"]

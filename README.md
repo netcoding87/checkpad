@@ -469,7 +469,16 @@ docker run -p 3000:3000 -e DATABASE_URL="postgresql://user:pass@host/db" checkpa
 
 See `Dockerfile` for multi-stage build configuration and `.dockerignore` for excluded files.
 
-### Local Development
+**Coolify PostgreSQL Integration:**
+
+1. In Coolify, create or link a PostgreSQL resource to your application
+2. Coolify automatically injects the `DATABASE_URL` environment variable into the container
+3. The application connects automatically on startup
+4. Database migrations run on deployment (optional - add to startup script)
+
+No manual environment variable configuration needed - the PostgreSQL resource connection is auto-configured.
+
+### Local Production Testing
 
 ```bash
 # Build for production

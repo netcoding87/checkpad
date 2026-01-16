@@ -22,7 +22,7 @@ This document serves as a living guide for AI agents working on the checkPAD pro
 - **Styling:** Chakra UI v3
 - **Routing:** TanStack Router (flat file-based)
 - **State Management:** TanStack React DB, TanStack React Form, TanStack React Table
-- **Deployment:** Cloudflare Workers (via Wrangler)
+- **Deployment:** Docker / Nitro (self-hosted, Coolify-ready)
 - **Runtime:** Node.js 24.12.0 (managed via Volta)
 
 ---
@@ -317,18 +317,58 @@ import { Link } from '@tanstack/react-router'
 
 ## Deployment
 
-**Target Platform:** Cloudflare Workers
+**Target Platform:** Docker / Nitro (self-hosted)
 
-**Deployment Steps:**
+**Deployment Options:**
 
-1. Build: `npm run build`
-2. Deploy: `npm run deploy`
+### Docker Deployment (Coolify-Ready)
 
-**Configuration:** `wrangler.jsonc`
+The application is containerized with a multi-stage Dockerfile optimized for production:
 
-- Compatibility date: 2025-09-02
-- Node.js compatibility enabled
-- Entry: `@tanstack/react-start/server-entry`
+```bash
+# Build Docker image
+docker build -t checkpad .
+
+# Run container
+docker run -p 3000:3000 \
+  -e DATABASE_URL="postgresql://user:pass@db-host/checkpad" \
+  checkpad
+```
+
+**Docker Configuration:**
+
+- Multi-stage build (builder + runtime stages)
+- Alpine Linux base image (minimal footprint)
+- Node 24.12.0 runtime matching Volta config
+- Health check endpoint included
+- Proper signal handling via dumb-init
+- Exposed port: 3000 (configurable via PORT env var)
+
+**Required Environment Variables:**
+
+- `DATABASE_URL`: PostgreSQL connection string (required)
+- `NODE_ENV`: Set to `production` in deployed environments
+- `PORT`: Server port (defaults to 3000)
+
+**Coolify Integration:**
+This Dockerfile is compatible with [Coolify](https://coolify.io/) for self-hosted deployments. Coolify will automatically:
+
+1. Build the Docker image
+2. Pull and run the container
+3. Manage networking and SSL termination
+4. Handle health checks and auto-restart
+
+No special configuration required - Coolify auto-detects the Dockerfile.
+
+### Local Production Testing
+
+```bash
+# Build for production
+npm run build
+
+# Start the production server locally
+node .output/server/index.mjs
+```
 
 ---
 

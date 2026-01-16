@@ -447,19 +447,37 @@ import { Dashboard } from '../../components/maintenance/Dashboard'
 
 ## 🚢 Deployment
 
-**Target Platform**: Cloudflare Workers
+**Deployment Options**:
+
+### Docker / Coolify (Self-Hosted)
+
+The application is containerized and ready for self-hosting platforms like [Coolify](https://coolify.io/).
 
 ```bash
-# Build and deploy
-npm run build
-npm run deploy
+# Build Docker image
+docker build -t checkpad .
+
+# Run container
+docker run -p 3000:3000 -e DATABASE_URL="postgresql://user:pass@host/db" checkpad
 ```
 
-**Configuration**: `wrangler.jsonc`
+**Environment Variables**:
 
-- Node.js compatibility enabled
-- Optimized for edge runtime
-- Automatic builds via Vite
+- `DATABASE_URL`: PostgreSQL connection string (required)
+- `NODE_ENV`: Set to `production` in deployed environments
+- `PORT`: Server port (defaults to 3000)
+
+See `Dockerfile` for multi-stage build configuration and `.dockerignore` for excluded files.
+
+### Local Development
+
+```bash
+# Build for production
+npm run build
+
+# Start the production server locally
+node .output/server/index.mjs
+```
 
 ---
 
@@ -476,8 +494,8 @@ npm run deploy
 | **UI Library** | Chakra UI v3                   |
 | **State**      | TanStack React DB, Form, Table |
 | **Testing**    | Vitest + React Testing Library |
-| **Build Tool** | Vite 7                         |
-| **Deployment** | Cloudflare Workers             |
+| **Build Tool** | Vite 7 + Nitro                 |
+| **Deployment** | Docker / Nitro / Coolify       |
 | **Runtime**    | Node.js 24.12.0 (Volta)        |
 
 ---

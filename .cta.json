@@ -14,7 +14,7 @@
   "framework": "react-cra",
   "chosenAddOns": [
     "eslint",
-    "cloudflare",
+    "nitro",
     "start",
     "compiler",
     "db",

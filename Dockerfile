@@ -29,6 +29,9 @@ RUN apk add --no-cache dumb-init
 COPY --from=builder /app/package.json /app/package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
 
+# Copy tsconfig for path resolution
+COPY --from=builder /app/tsconfig.json ./
+
 # Copy drizzle config and migration files
 COPY --from=builder /app/drizzle.config.ts ./
 COPY --from=builder /app/drizzle ./drizzle

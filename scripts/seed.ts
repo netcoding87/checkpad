@@ -8,6 +8,33 @@ config()
 
 const seedUser = 'seed-script'
 
+// Calculate date ranges based on current date
+const now = new Date()
+const startRange = new Date(now)
+startRange.setDate(startRange.getDate() - 28) // 4 weeks ago
+const endRange = new Date(now)
+endRange.setDate(endRange.getDate() + 42) // 6 weeks ahead
+
+// Helper to create date within range (percentage 0-1 of total range)
+const getDateInRange = (percentage: number): Date => {
+  const totalMs = endRange.getTime() - startRange.getTime()
+  return new Date(startRange.getTime() + totalMs * percentage)
+}
+
+// Helper to subtract days from a date
+const subtractDays = (date: Date, days: number): Date => {
+  const result = new Date(date)
+  result.setDate(result.getDate() - days)
+  return result
+}
+
+// Helper to add days to a date
+const addDays = (date: Date, days: number): Date => {
+  const result = new Date(date)
+  result.setDate(result.getDate() + days)
+  return result
+}
+
 const staff = [
   {
     firstName: 'Julia',
@@ -86,105 +113,142 @@ const cases = [
     name: 'HVAC quarterly inspection',
     estimatedHours: 8.0,
     estimatedCosts: 1200.0,
-    plannedStart: new Date('2025-11-25'),
-    plannedEnd: new Date('2025-12-01'),
+    plannedStart: getDateInRange(0.05),
+    plannedEnd: addDays(getDateInRange(0.05), 5),
     offerCreatedBy: 'julia.hartmann',
-    offerCreatedAt: new Date('2025-11-15T10:30:00Z'),
-    offerAcceptedAt: new Date('2025-11-17T09:00:00Z'),
+    offerCreatedAt: subtractDays(getDateInRange(0.05), 8),
+    offerAcceptedAt: subtractDays(getDateInRange(0.05), 6),
     invoiceCreatedBy: 'finance.bot',
-    invoiceCreatedAt: new Date('2025-12-02T12:00:00Z'),
-    invoicePaidAt: new Date('2025-12-08T12:00:00Z'),
-    createdAt: new Date('2025-11-15T10:30:00Z'),
-    updatedAt: new Date('2025-12-08T12:00:00Z'),
+    invoiceCreatedAt: addDays(getDateInRange(0.05), 6),
+    invoicePaidAt: addDays(getDateInRange(0.05), 12),
+    createdAt: subtractDays(getDateInRange(0.05), 8),
+    updatedAt: addDays(getDateInRange(0.05), 12),
   },
   {
     name: 'Generator oil change',
     estimatedHours: 4.5,
     estimatedCosts: 650.0,
-    plannedStart: new Date('2025-12-03'),
-    plannedEnd: new Date('2025-12-08'),
+    plannedStart: getDateInRange(0.15),
+    plannedEnd: addDays(getDateInRange(0.15), 4),
     offerCreatedBy: 'marco.richter',
-    offerCreatedAt: new Date('2025-11-20T09:15:00Z'),
-    offerAcceptedAt: new Date('2025-11-21T15:45:00Z'),
+    offerCreatedAt: subtractDays(getDateInRange(0.15), 10),
+    offerAcceptedAt: subtractDays(getDateInRange(0.15), 9),
     invoiceCreatedBy: 'finance.bot',
-    invoiceCreatedAt: new Date('2025-12-09T09:00:00Z'),
-    createdAt: new Date('2025-11-20T09:15:00Z'),
-    updatedAt: new Date('2025-12-09T09:00:00Z'),
+    invoiceCreatedAt: addDays(getDateInRange(0.15), 5),
+    createdAt: subtractDays(getDateInRange(0.15), 10),
+    updatedAt: addDays(getDateInRange(0.15), 5),
   },
   {
     name: 'Roof leak assessment',
     estimatedHours: 6.0,
     estimatedCosts: 1800.0,
-    plannedStart: new Date('2025-12-10'),
-    plannedEnd: new Date('2025-12-16'),
+    plannedStart: getDateInRange(0.25),
+    plannedEnd: addDays(getDateInRange(0.25), 5),
     offerCreatedBy: 'svenja.vogel',
-    offerCreatedAt: new Date('2025-11-28T11:00:00Z'),
-    createdAt: new Date('2025-11-28T11:00:00Z'),
-    updatedAt: new Date('2025-11-28T11:00:00Z'),
+    offerCreatedAt: subtractDays(getDateInRange(0.25), 7),
+    createdAt: subtractDays(getDateInRange(0.25), 7),
+    updatedAt: subtractDays(getDateInRange(0.25), 7),
   },
   {
     name: 'Elevator safety check',
     estimatedHours: 10.0,
     estimatedCosts: 2400.0,
-    plannedStart: new Date('2025-12-15'),
-    plannedEnd: new Date('2025-12-21'),
+    plannedStart: getDateInRange(0.35),
+    plannedEnd: addDays(getDateInRange(0.35), 6),
     offerCreatedBy: 'anna.lenz',
-    offerCreatedAt: new Date('2025-12-01T14:20:00Z'),
-    offerAcceptedAt: new Date('2025-12-03T08:45:00Z'),
-    createdAt: new Date('2025-12-01T14:20:00Z'),
-    updatedAt: new Date('2025-12-03T08:45:00Z'),
+    offerCreatedAt: subtractDays(getDateInRange(0.35), 12),
+    offerAcceptedAt: subtractDays(getDateInRange(0.35), 10),
+    createdAt: subtractDays(getDateInRange(0.35), 12),
+    updatedAt: subtractDays(getDateInRange(0.35), 10),
   },
   {
     name: 'Fire alarm panel recertification',
     estimatedHours: 3.5,
     estimatedCosts: 950.0,
-    plannedStart: new Date('2025-12-20'),
-    plannedEnd: new Date('2025-12-26'),
+    plannedStart: getDateInRange(0.45),
+    plannedEnd: addDays(getDateInRange(0.45), 4),
     offerCreatedBy: 'julia.hartmann',
-    offerCreatedAt: new Date('2025-12-05T10:00:00Z'),
-    offerAcceptedAt: new Date('2025-12-06T16:00:00Z'),
+    offerCreatedAt: subtractDays(getDateInRange(0.45), 9),
+    offerAcceptedAt: subtractDays(getDateInRange(0.45), 8),
     invoiceCreatedBy: 'finance.bot',
-    invoiceCreatedAt: new Date('2025-12-27T10:30:00Z'),
-    createdAt: new Date('2025-12-05T10:00:00Z'),
-    updatedAt: new Date('2025-12-27T10:30:00Z'),
+    invoiceCreatedAt: addDays(getDateInRange(0.45), 5),
+    createdAt: subtractDays(getDateInRange(0.45), 9),
+    updatedAt: addDays(getDateInRange(0.45), 5),
   },
   {
     name: 'Sprinkler system flush',
     estimatedHours: 7.0,
     estimatedCosts: 1350.0,
-    plannedStart: new Date('2025-12-23'),
-    plannedEnd: new Date('2025-12-30'),
+    plannedStart: getDateInRange(0.53),
+    plannedEnd: addDays(getDateInRange(0.53), 6),
     offerCreatedBy: 'marco.richter',
-    offerCreatedAt: new Date('2025-12-12T09:45:00Z'),
-    createdAt: new Date('2025-12-12T09:45:00Z'),
-    updatedAt: new Date('2025-12-12T09:45:00Z'),
+    offerCreatedAt: subtractDays(getDateInRange(0.53), 8),
+    createdAt: subtractDays(getDateInRange(0.53), 8),
+    updatedAt: subtractDays(getDateInRange(0.53), 8),
   },
   {
     name: 'Parking gate motor replacement',
     estimatedHours: 12.0,
     estimatedCosts: 3200.0,
-    plannedStart: new Date('2026-01-05'),
-    plannedEnd: new Date('2026-01-12'),
+    plannedStart: getDateInRange(0.61),
+    plannedEnd: addDays(getDateInRange(0.61), 7),
     offerCreatedBy: 'svenja.vogel',
-    offerCreatedAt: new Date('2025-12-18T13:10:00Z'),
-    offerAcceptedAt: new Date('2025-12-20T09:25:00Z'),
-    createdAt: new Date('2025-12-18T13:10:00Z'),
-    updatedAt: new Date('2025-12-20T09:25:00Z'),
+    offerCreatedAt: subtractDays(getDateInRange(0.61), 11),
+    offerAcceptedAt: subtractDays(getDateInRange(0.61), 9),
+    createdAt: subtractDays(getDateInRange(0.61), 11),
+    updatedAt: subtractDays(getDateInRange(0.61), 9),
   },
   {
     name: 'Chiller compressor diagnostics',
     estimatedHours: 5.0,
     estimatedCosts: 2100.0,
-    plannedStart: new Date('2026-01-15'),
-    plannedEnd: new Date('2026-01-20'),
+    plannedStart: getDateInRange(0.69),
+    plannedEnd: addDays(getDateInRange(0.69), 5),
     offerCreatedBy: 'anna.lenz',
-    offerCreatedAt: new Date('2025-12-22T15:00:00Z'),
-    offerAcceptedAt: new Date('2025-12-23T11:30:00Z'),
+    offerCreatedAt: subtractDays(getDateInRange(0.69), 10),
+    offerAcceptedAt: subtractDays(getDateInRange(0.69), 9),
     invoiceCreatedBy: 'finance.bot',
-    invoiceCreatedAt: new Date('2026-01-21T10:00:00Z'),
-    invoicePaidAt: new Date('2026-01-28T10:00:00Z'),
-    createdAt: new Date('2025-12-22T15:00:00Z'),
-    updatedAt: new Date('2026-01-28T10:00:00Z'),
+    invoiceCreatedAt: addDays(getDateInRange(0.69), 6),
+    invoicePaidAt: addDays(getDateInRange(0.69), 13),
+    createdAt: subtractDays(getDateInRange(0.69), 10),
+    updatedAt: addDays(getDateInRange(0.69), 13),
+  },
+  {
+    name: 'Boiler maintenance',
+    estimatedHours: 9.0,
+    estimatedCosts: 1750.0,
+    plannedStart: getDateInRange(0.77),
+    plannedEnd: addDays(getDateInRange(0.77), 5),
+    offerCreatedBy: 'thomas.schmidt',
+    offerCreatedAt: subtractDays(getDateInRange(0.77), 8),
+    offerAcceptedAt: subtractDays(getDateInRange(0.77), 7),
+    createdAt: subtractDays(getDateInRange(0.77), 8),
+    updatedAt: subtractDays(getDateInRange(0.77), 7),
+  },
+  {
+    name: 'Emergency lighting test',
+    estimatedHours: 4.0,
+    estimatedCosts: 800.0,
+    plannedStart: getDateInRange(0.85),
+    plannedEnd: addDays(getDateInRange(0.85), 3),
+    offerCreatedBy: 'julia.hartmann',
+    offerCreatedAt: subtractDays(getDateInRange(0.85), 7),
+    invoiceCreatedBy: 'finance.bot',
+    invoiceCreatedAt: addDays(getDateInRange(0.85), 4),
+    createdAt: subtractDays(getDateInRange(0.85), 7),
+    updatedAt: addDays(getDateInRange(0.85), 4),
+  },
+  {
+    name: 'Water tank inspection',
+    estimatedHours: 6.5,
+    estimatedCosts: 1450.0,
+    plannedStart: getDateInRange(0.93),
+    plannedEnd: addDays(getDateInRange(0.93), 4),
+    offerCreatedBy: 'marco.richter',
+    offerCreatedAt: subtractDays(getDateInRange(0.93), 9),
+    offerAcceptedAt: subtractDays(getDateInRange(0.93), 8),
+    createdAt: subtractDays(getDateInRange(0.93), 9),
+    updatedAt: subtractDays(getDateInRange(0.93), 8),
   },
 ]
 

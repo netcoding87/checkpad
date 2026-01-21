@@ -24,6 +24,27 @@ services:
       timeout: 5s
       retries: 5
 
+  electric:
+    image: docker.io/electricsql/electric:latest
+    container_name: checkpad-electric
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      # Not suitable for production. Only use insecure mode in development or if you've otherwise secured the Electric API.
+      # See https://electric-sql.com/docs/guides/security
+      ELECTRIC_INSECURE: true
+    ports:
+      - '3000:3000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: checkpad-pgadmin
@@ -39,21 +60,12 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-
-  electric:
-    image: docker.io/electricsql/electric:latest
-    container_name: checkpad-electric
-    restart: unless-stopped
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
-      # Not suitable for production. Only use insecure mode in development or if you've otherwise secured the Electric API.
-      # See https://electric-sql.com/docs/guides/security
-      ELECTRIC_INSECURE: true
-    ports:
-      - '3000:3000'
-    depends_on:
-      postgres:
-        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
 volumes:
   postgres_data:

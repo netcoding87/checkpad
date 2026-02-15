@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Container,
@@ -13,10 +14,13 @@ import {
 } from '@chakra-ui/react'
 import { gte, lte, useLiveQuery } from '@tanstack/react-db'
 import { Link } from '@tanstack/react-router'
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
+import { AlertCircle, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { MaintenanceCase } from '@/db/collections'
-import { maintenanceCasesCollection } from '@/db/collections'
+import {
+  maintenanceCaseStaffCollection,
+  maintenanceCasesCollection,
+} from '@/db/collections'
 import { useColorModeValue } from '@/components/ui/color-mode'
 
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -125,6 +129,19 @@ export function HangarCalendar() {
         .where(({ case: c }) => lte(c.plannedEnd, new Date(`${year}-12-31`))),
     [year],
   )
+
+  const { data: assignments = [] } = useLiveQuery(
+    maintenanceCaseStaffCollection,
+  )
+
+  // Create a map of case IDs to assignment counts
+  const assignmentCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const assignment of assignments) {
+      counts[assignment.caseId] = (counts[assignment.caseId] || 0) + 1
+    }
+    return counts
+  }, [assignments])
 
   const months = useMemo(() => buildMonths(year), [year])
   const totalDaysInYear = useMemo(
@@ -290,41 +307,63 @@ export function HangarCalendar() {
                   </Box>
                 ) : (
                   <Box as="ul">
-                    {casesForYear.map((maintenanceCase) => (
-                      <Box
-                        alignItems="center"
-                        as="li"
-                        cursor="pointer"
-                        display="flex"
-                        gap={3}
-                        key={maintenanceCase.id}
-                        minHeight={`${caseRowHeight}px`}
-                        px={{ base: 2, sm: 4 }}
-                        transition="background 0.2s"
-                        _hover={{ bg: 'bg.muted' }}
-                        asChild
-                      >
-                        <Link
-                          to="/hangar/$caseId"
-                          params={{ caseId: maintenanceCase.id }}
+                    {casesForYear.map((maintenanceCase) => {
+                      const staffCount =
+                        assignmentCounts[maintenanceCase.id] || 0
+                      return (
+                        <Box
+                          alignItems="center"
+                          as="li"
+                          cursor="pointer"
+                          display="flex"
+                          gap={3}
+                          key={maintenanceCase.id}
+                          minHeight={`${caseRowHeight}px`}
+                          px={{ base: 2, sm: 4 }}
+                          transition="background 0.2s"
+                          _hover={{ bg: 'bg.muted' }}
+                          asChild
                         >
-                          <Box
-                            aria-hidden
-                            bg={maintenanceCase.color}
-                            borderRadius="full"
-                            height="10px"
-                            minW="10px"
-                          />
-                          <Text
-                            fontWeight="medium"
-                            lineClamp={1}
-                            title={maintenanceCase.name}
+                          <Link
+                            to="/hangar/$caseId"
+                            params={{ caseId: maintenanceCase.id }}
                           >
-                            {maintenanceCase.name}
-                          </Text>
-                        </Link>
-                      </Box>
-                    ))}
+                            <Box
+                              aria-hidden
+                              bg={maintenanceCase.color}
+                              borderRadius="full"
+                              height="10px"
+                              minW="10px"
+                            />
+                            <Stack
+                              flex={1}
+                              gap={1}
+                              direction="row"
+                              align="center"
+                            >
+                              <Text
+                                fontWeight="medium"
+                                lineClamp={1}
+                                title={maintenanceCase.name}
+                              >
+                                {maintenanceCase.name}
+                              </Text>
+                              {staffCount === 0 && (
+                                <AlertCircle
+                                  size={14}
+                                  color="var(--chakra-colors-yellow-500)"
+                                />
+                              )}
+                              {staffCount > 0 && (
+                                <Badge colorPalette="blue" fontSize="xs">
+                                  {staffCount}
+                                </Badge>
+                              )}
+                            </Stack>
+                          </Link>
+                        </Box>
+                      )
+                    })}
                   </Box>
                 )}
               </Box>

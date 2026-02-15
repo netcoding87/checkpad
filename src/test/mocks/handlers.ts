@@ -1,5 +1,5 @@
-import type { DefaultBodyType, PathParams } from 'msw'
 import { HttpResponse, delay, http } from 'msw'
+import type { DefaultBodyType, PathParams } from 'msw'
 
 // API response type for maintenance cases (JSON over the wire)
 export type MaintenanceCaseApi = {

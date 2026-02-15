@@ -20,8 +20,10 @@ import { Route as HangarNewRouteImport } from './routes/hangar.new'
 import { Route as HangarCaseIdRouteImport } from './routes/hangar.$caseId'
 import { Route as ApiStaffRouteImport } from './routes/api.staff'
 import { Route as ApiMaintenanceCasesRouteImport } from './routes/api.maintenance-cases'
+import { Route as ApiMaintenanceCaseStaffRouteImport } from './routes/api.maintenance-case-staff'
 import { Route as ApiElectricStaffRouteImport } from './routes/api.electric.staff'
 import { Route as ApiElectricMaintenanceCasesRouteImport } from './routes/api.electric.maintenance-cases'
+import { Route as ApiElectricMaintenanceCaseStaffRouteImport } from './routes/api.electric.maintenance-case-staff'
 
 const StaffRoute = StaffRouteImport.update({
   id: '/staff',
@@ -78,6 +80,11 @@ const ApiMaintenanceCasesRoute = ApiMaintenanceCasesRouteImport.update({
   path: '/api/maintenance-cases',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMaintenanceCaseStaffRoute = ApiMaintenanceCaseStaffRouteImport.update({
+  id: '/api/maintenance-case-staff',
+  path: '/api/maintenance-case-staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiElectricStaffRoute = ApiElectricStaffRouteImport.update({
   id: '/api/electric/staff',
   path: '/api/electric/staff',
@@ -89,11 +96,18 @@ const ApiElectricMaintenanceCasesRoute =
     path: '/api/electric/maintenance-cases',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiElectricMaintenanceCaseStaffRoute =
+  ApiElectricMaintenanceCaseStaffRouteImport.update({
+    id: '/api/electric/maintenance-case-staff',
+    path: '/api/electric/maintenance-case-staff',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/hangar': typeof HangarRouteWithChildren
   '/staff': typeof StaffRouteWithChildren
+  '/api/maintenance-case-staff': typeof ApiMaintenanceCaseStaffRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
   '/api/staff': typeof ApiStaffRoute
   '/hangar/$caseId': typeof HangarCaseIdRoute
@@ -102,11 +116,13 @@ export interface FileRoutesByFullPath {
   '/staff/new': typeof StaffNewRoute
   '/hangar/': typeof HangarIndexRoute
   '/staff/': typeof StaffIndexRoute
+  '/api/electric/maintenance-case-staff': typeof ApiElectricMaintenanceCaseStaffRoute
   '/api/electric/maintenance-cases': typeof ApiElectricMaintenanceCasesRoute
   '/api/electric/staff': typeof ApiElectricStaffRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/maintenance-case-staff': typeof ApiMaintenanceCaseStaffRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
   '/api/staff': typeof ApiStaffRoute
   '/hangar/$caseId': typeof HangarCaseIdRoute
@@ -115,6 +131,7 @@ export interface FileRoutesByTo {
   '/staff/new': typeof StaffNewRoute
   '/hangar': typeof HangarIndexRoute
   '/staff': typeof StaffIndexRoute
+  '/api/electric/maintenance-case-staff': typeof ApiElectricMaintenanceCaseStaffRoute
   '/api/electric/maintenance-cases': typeof ApiElectricMaintenanceCasesRoute
   '/api/electric/staff': typeof ApiElectricStaffRoute
 }
@@ -123,6 +140,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/hangar': typeof HangarRouteWithChildren
   '/staff': typeof StaffRouteWithChildren
+  '/api/maintenance-case-staff': typeof ApiMaintenanceCaseStaffRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
   '/api/staff': typeof ApiStaffRoute
   '/hangar/$caseId': typeof HangarCaseIdRoute
@@ -131,6 +149,7 @@ export interface FileRoutesById {
   '/staff/new': typeof StaffNewRoute
   '/hangar/': typeof HangarIndexRoute
   '/staff/': typeof StaffIndexRoute
+  '/api/electric/maintenance-case-staff': typeof ApiElectricMaintenanceCaseStaffRoute
   '/api/electric/maintenance-cases': typeof ApiElectricMaintenanceCasesRoute
   '/api/electric/staff': typeof ApiElectricStaffRoute
 }
@@ -140,6 +159,7 @@ export interface FileRouteTypes {
     | '/'
     | '/hangar'
     | '/staff'
+    | '/api/maintenance-case-staff'
     | '/api/maintenance-cases'
     | '/api/staff'
     | '/hangar/$caseId'
@@ -148,11 +168,13 @@ export interface FileRouteTypes {
     | '/staff/new'
     | '/hangar/'
     | '/staff/'
+    | '/api/electric/maintenance-case-staff'
     | '/api/electric/maintenance-cases'
     | '/api/electric/staff'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/api/maintenance-case-staff'
     | '/api/maintenance-cases'
     | '/api/staff'
     | '/hangar/$caseId'
@@ -161,6 +183,7 @@ export interface FileRouteTypes {
     | '/staff/new'
     | '/hangar'
     | '/staff'
+    | '/api/electric/maintenance-case-staff'
     | '/api/electric/maintenance-cases'
     | '/api/electric/staff'
   id:
@@ -168,6 +191,7 @@ export interface FileRouteTypes {
     | '/'
     | '/hangar'
     | '/staff'
+    | '/api/maintenance-case-staff'
     | '/api/maintenance-cases'
     | '/api/staff'
     | '/hangar/$caseId'
@@ -176,6 +200,7 @@ export interface FileRouteTypes {
     | '/staff/new'
     | '/hangar/'
     | '/staff/'
+    | '/api/electric/maintenance-case-staff'
     | '/api/electric/maintenance-cases'
     | '/api/electric/staff'
   fileRoutesById: FileRoutesById
@@ -184,8 +209,10 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HangarRoute: typeof HangarRouteWithChildren
   StaffRoute: typeof StaffRouteWithChildren
+  ApiMaintenanceCaseStaffRoute: typeof ApiMaintenanceCaseStaffRoute
   ApiMaintenanceCasesRoute: typeof ApiMaintenanceCasesRoute
   ApiStaffRoute: typeof ApiStaffRoute
+  ApiElectricMaintenanceCaseStaffRoute: typeof ApiElectricMaintenanceCaseStaffRoute
   ApiElectricMaintenanceCasesRoute: typeof ApiElectricMaintenanceCasesRoute
   ApiElectricStaffRoute: typeof ApiElectricStaffRoute
 }
@@ -269,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMaintenanceCasesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/maintenance-case-staff': {
+      id: '/api/maintenance-case-staff'
+      path: '/api/maintenance-case-staff'
+      fullPath: '/api/maintenance-case-staff'
+      preLoaderRoute: typeof ApiMaintenanceCaseStaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/electric/staff': {
       id: '/api/electric/staff'
       path: '/api/electric/staff'
@@ -281,6 +315,13 @@ declare module '@tanstack/react-router' {
       path: '/api/electric/maintenance-cases'
       fullPath: '/api/electric/maintenance-cases'
       preLoaderRoute: typeof ApiElectricMaintenanceCasesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/electric/maintenance-case-staff': {
+      id: '/api/electric/maintenance-case-staff'
+      path: '/api/electric/maintenance-case-staff'
+      fullPath: '/api/electric/maintenance-case-staff'
+      preLoaderRoute: typeof ApiElectricMaintenanceCaseStaffRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -319,8 +360,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HangarRoute: HangarRouteWithChildren,
   StaffRoute: StaffRouteWithChildren,
+  ApiMaintenanceCaseStaffRoute: ApiMaintenanceCaseStaffRoute,
   ApiMaintenanceCasesRoute: ApiMaintenanceCasesRoute,
   ApiStaffRoute: ApiStaffRoute,
+  ApiElectricMaintenanceCaseStaffRoute: ApiElectricMaintenanceCaseStaffRoute,
   ApiElectricMaintenanceCasesRoute: ApiElectricMaintenanceCasesRoute,
   ApiElectricStaffRoute: ApiElectricStaffRoute,
 }

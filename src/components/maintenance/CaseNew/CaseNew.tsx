@@ -2,7 +2,10 @@ import { Container, Heading, Stack } from '@chakra-ui/react'
 import { useNavigate } from '@tanstack/react-router'
 import { CaseForm } from '../CaseForm'
 import type { CaseFormData } from '../CaseForm'
-import { maintenanceCasesCollection } from '@/db/collections'
+import {
+  maintenanceCaseStaffCollection,
+  maintenanceCasesCollection,
+} from '@/db/collections'
 import { toaster } from '@/components/ui/toaster'
 
 export function CaseNew() {
@@ -27,6 +30,21 @@ export function CaseNew() {
         createdAt: new Date(),
         updatedAt: new Date(),
       })
+
+      // Add staff assignments
+      if (data.staffIds.length > 0) {
+        for (const staffId of data.staffIds) {
+          maintenanceCaseStaffCollection.insert({
+            id: crypto.randomUUID(),
+            caseId,
+            staffId,
+            assignedAt: new Date(),
+            assignedBy: 'system', // TODO: get from session/auth
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+        }
+      }
 
       toaster.create({
         title: 'Wartungsfall erstellt',

@@ -1,1 +1,1 @@
-export { RootDocument } from './Root';
+export { RootDocument } from './Root'

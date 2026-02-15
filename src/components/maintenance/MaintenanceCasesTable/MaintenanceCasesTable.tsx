@@ -9,7 +9,12 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { useLiveQuery } from '@tanstack/react-db'
-import { maintenanceCasesCollection } from '@/db/collections'
+import { useMemo } from 'react'
+import { Users } from 'lucide-react'
+import {
+  maintenanceCaseStaffCollection,
+  maintenanceCasesCollection,
+} from '@/db/collections'
 import { toCommercial } from '@/utils/number'
 
 function getStatus(maintenanceCase: {
@@ -33,8 +38,18 @@ export function MaintenanceCasesTable() {
   const { data: maintenanceCases = [], isLoading } = useLiveQuery(
     maintenanceCasesCollection,
   )
+  const { data: assignments = [] } = useLiveQuery(
+    maintenanceCaseStaffCollection,
+  )
 
-  console.log('Maintenance Cases:', maintenanceCases)
+  // Create a map of case IDs to assignment counts
+  const assignmentCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const assignment of assignments) {
+      counts[assignment.caseId] = (counts[assignment.caseId] || 0) + 1
+    }
+    return counts
+  }, [assignments])
 
   return (
     <Stack gap={4}>
@@ -64,19 +79,21 @@ export function MaintenanceCasesTable() {
                 <Table.ColumnHeader>Planned Start</Table.ColumnHeader>
                 <Table.ColumnHeader>Planned End</Table.ColumnHeader>
                 <Table.ColumnHeader>Status</Table.ColumnHeader>
+                <Table.ColumnHeader>Staff</Table.ColumnHeader>
               </Table.Row>
             </Table.Header>
             <Table.Body>
               {isLoading
                 ? Array.from({ length: 5 }).map((_, i) => (
                     <Table.Row key={`skeleton-${i}`}>
-                      <Table.Cell colSpan={6}>
+                      <Table.Cell colSpan={7}>
                         <Skeleton height="24px" rounded="md" />
                       </Table.Cell>
                     </Table.Row>
                   ))
                 : maintenanceCases.map((maintenanceCase) => {
                     const status = getStatus(maintenanceCase)
+                    const staffCount = assignmentCounts[maintenanceCase.id] || 0
                     return (
                       <Table.Row key={maintenanceCase.id}>
                         <Table.Cell maxW="sm">
@@ -126,6 +143,18 @@ export function MaintenanceCasesTable() {
                           >
                             {status.label}
                           </Badge>
+                        </Table.Cell>
+                        <Table.Cell>
+                          {staffCount > 0 ? (
+                            <HStack gap={1}>
+                              <Users size={16} />
+                              <Text>{staffCount}</Text>
+                            </HStack>
+                          ) : (
+                            <Badge colorPalette="gray" variant="subtle">
+                              Keine Zuweisung
+                            </Badge>
+                          )}
                         </Table.Cell>
                       </Table.Row>
                     )

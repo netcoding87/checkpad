@@ -7,10 +7,19 @@ import {
   Input,
   Menu,
   Stack,
+  Text,
 } from '@chakra-ui/react'
+import { useLiveQuery } from '@tanstack/react-db'
 import { useForm } from '@tanstack/react-form'
 import { ChevronDown } from 'lucide-react'
+import { useMemo } from 'react'
 import type { CheckboxCheckedChangeDetails } from '@chakra-ui/react'
+import type { SelectOption } from '@/components/ui/select'
+import {
+  maintenanceCaseStaffCollection,
+  staffCollection,
+} from '@/db/collections'
+import Select from '@/components/ui/select'
 import { Field } from '@/components/ui/field'
 
 export type CaseFormData = {
@@ -23,6 +32,7 @@ export type CaseFormData = {
   offerCreatedAt: Date | null
   plannedEnd: Date
   plannedStart: Date
+  staffIds: Array<string>
 }
 
 type CaseFormProps = {
@@ -42,6 +52,48 @@ export function CaseForm({
   onSubmit,
   submitLabel = 'Speichern',
 }: CaseFormProps) {
+  // Load staff and assignments
+  const { data: allStaff = [] } = useLiveQuery(staffCollection)
+  const { data: assignments = [] } = useLiveQuery(
+    maintenanceCaseStaffCollection,
+  )
+
+  // Filter to only active staff
+  const activeStaff = useMemo(
+    () => allStaff.filter((s) => s.isActive),
+    [allStaff],
+  )
+
+  // Calculate workload for each staff member
+  const staffWorkload = useMemo(() => {
+    const workload: Record<string, number> = {}
+    for (const staff of activeStaff) {
+      workload[staff.id] = assignments.filter(
+        (a) => a.staffId === staff.id,
+      ).length
+    }
+    return workload
+  }, [activeStaff, assignments])
+
+  // Prepare staff options for Select component
+  const staffOptions: Array<
+    SelectOption<{
+      email: string
+      workload: number
+    }>
+  > = useMemo(
+    () =>
+      activeStaff.map((staff) => ({
+        data: {
+          email: staff.email,
+          workload: staffWorkload[staff.id] || 0,
+        },
+        label: `${staff.firstName} ${staff.lastName}`,
+        value: staff.id,
+      })),
+    [activeStaff, staffWorkload],
+  )
+
   const form = useForm({
     defaultValues: {
       estimatedCosts: null,
@@ -53,10 +105,12 @@ export function CaseForm({
       offerCreatedAt: null,
       plannedEnd: new Date(),
       plannedStart: new Date(),
+      staffIds: [],
       ...defaultValues,
     } as CaseFormData,
     onSubmit: async ({ value }) => {
       await onSubmit(value)
+      form.reset(value)
     },
   })
 
@@ -191,6 +245,38 @@ export function CaseForm({
                     step="0.01"
                     type="number"
                     value={field.state.value ?? ''}
+                  />
+                </Field>
+              )}
+            </form.Field>
+          </Fieldset.Content>
+        </Fieldset.Root>
+
+        <Fieldset.Root>
+          <Fieldset.Legend>Team Zuweisung</Fieldset.Legend>
+          <Fieldset.Content>
+            <form.Field name="staffIds">
+              {(field) => (
+                <Field label="Mitarbeiter">
+                  <Select
+                    isClearable
+                    isMultiple
+                    onChange={(values) => field.handleChange(values)}
+                    options={staffOptions}
+                    placeholder="Mitarbeiter auswählen"
+                    renderItem={(item, opts) => (
+                      <Stack direction="column" gap={1}>
+                        <Text>{item.label}</Text>
+                        <Text
+                          color={opts?.selected ? 'white' : 'gray.500'}
+                          fontSize="sm"
+                        >
+                          {item.data?.email}
+                        </Text>
+                      </Stack>
+                    )}
+                    searchable
+                    value={field.state.value}
                   />
                 </Field>
               )}

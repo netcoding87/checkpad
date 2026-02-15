@@ -1,6 +1,7 @@
 import {
   boolean,
   doublePrecision,
+  foreignKey,
   index,
   integer,
   jsonb,
@@ -8,6 +9,7 @@ import {
   serial,
   text,
   timestamp,
+  unique,
   uuid,
 } from 'drizzle-orm/pg-core'
 
@@ -65,4 +67,32 @@ export const auditLogTable = pgTable(
     changedAt: timestamp().defaultNow().notNull(),
   },
   (table) => [index('record_id_idx').on(table.recordId)],
+)
+
+export const maintenanceCaseStaffTable = pgTable(
+  'maintenance_case_staff',
+  {
+    id: uuid().defaultRandom().primaryKey(),
+    caseId: uuid().notNull(),
+    staffId: uuid().notNull(),
+    assignedAt: timestamp().defaultNow().notNull(),
+    assignedBy: text().notNull(),
+    createdAt: timestamp().defaultNow().notNull(),
+    updatedAt: timestamp().defaultNow().notNull(),
+  },
+  (table) => [
+    unique().on(table.caseId, table.staffId),
+    index('case_id_idx').on(table.caseId),
+    index('staff_id_idx').on(table.staffId),
+    foreignKey({
+      columns: [table.caseId],
+      foreignColumns: [maintenanceCasesTable.id],
+      name: 'fk_maintenance_case_staff_case_id',
+    }),
+    foreignKey({
+      columns: [table.staffId],
+      foreignColumns: [staffTable.id],
+      name: 'fk_maintenance_case_staff_staff_id',
+    }),
+  ],
 )

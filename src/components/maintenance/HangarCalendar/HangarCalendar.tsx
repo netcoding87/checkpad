@@ -1,3 +1,11 @@
+import { useColorModeValue } from '@/components/ui/color-mode'
+import { Tooltip } from '@/components/ui/tooltip'
+import type { MaintenanceCase } from '@/db/collections'
+import {
+  maintenanceCaseStaffCollection,
+  maintenanceCasesCollection,
+  staffCollection,
+} from '@/db/collections'
 import {
   Badge,
   Box,
@@ -16,12 +24,6 @@ import { gte, lte, useLiveQuery } from '@tanstack/react-db'
 import { Link } from '@tanstack/react-router'
 import { AlertCircle, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import type { MaintenanceCase } from '@/db/collections'
-import {
-  maintenanceCaseStaffCollection,
-  maintenanceCasesCollection,
-} from '@/db/collections'
-import { useColorModeValue } from '@/components/ui/color-mode'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const COLOR_PALETTE = [
@@ -133,6 +135,7 @@ export function HangarCalendar() {
   const { data: assignments = [] } = useLiveQuery(
     maintenanceCaseStaffCollection,
   )
+  const { data: staff = [] } = useLiveQuery(staffCollection)
 
   // Create a map of case IDs to assignment counts
   const assignmentCounts = useMemo(() => {
@@ -142,6 +145,21 @@ export function HangarCalendar() {
     }
     return counts
   }, [assignments])
+
+  // Create a map of case IDs to staff names
+  const assignedStaffNames = useMemo(() => {
+    const names: Record<string, Array<string>> = {}
+    for (const assignment of assignments) {
+      const staffMember = staff.find((s) => s.id === assignment.staffId)
+      if (staffMember) {
+        names[assignment.caseId] = names[assignment.caseId] ?? []
+        names[assignment.caseId].push(
+          `${staffMember.firstName} ${staffMember.lastName}`,
+        )
+      }
+    }
+    return names
+  }, [assignments, staff])
 
   const months = useMemo(() => buildMonths(year), [year])
   const totalDaysInYear = useMemo(
@@ -355,9 +373,15 @@ export function HangarCalendar() {
                                 />
                               )}
                               {staffCount > 0 && (
-                                <Badge colorPalette="blue" fontSize="xs">
-                                  {staffCount}
-                                </Badge>
+                                <Tooltip
+                                  content={(
+                                    assignedStaffNames[maintenanceCase.id] ?? []
+                                  ).join(', ')}
+                                >
+                                  <Badge colorPalette="blue" fontSize="xs">
+                                    {staffCount}
+                                  </Badge>
+                                </Tooltip>
                               )}
                             </Stack>
                           </Link>

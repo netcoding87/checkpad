@@ -2,4 +2,16 @@
 
 import { tanstackConfig } from '@tanstack/eslint-config'
 
-export default [...tanstackConfig]
+export default [
+  ...tanstackConfig,
+  {
+    ignores: [
+      '.output/**',
+      'dist/**',
+      'coverage/**',
+      'drizzle/**',
+      '*.config.js',
+      '*.config.ts',
+    ],
+  },
+]

@@ -1,3 +1,10 @@
+import { Tooltip } from '@/components/ui/tooltip'
+import {
+  maintenanceCaseStaffCollection,
+  maintenanceCasesCollection,
+  staffCollection,
+} from '@/db/collections'
+import { toCommercial } from '@/utils/number'
 import {
   Badge,
   Box,
@@ -9,13 +16,8 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { useLiveQuery } from '@tanstack/react-db'
-import { useMemo } from 'react'
 import { Users } from 'lucide-react'
-import {
-  maintenanceCaseStaffCollection,
-  maintenanceCasesCollection,
-} from '@/db/collections'
-import { toCommercial } from '@/utils/number'
+import { useMemo } from 'react'
 
 function getStatus(maintenanceCase: {
   offerCreatedAt: Date | null
@@ -41,6 +43,7 @@ export function MaintenanceCasesTable() {
   const { data: assignments = [] } = useLiveQuery(
     maintenanceCaseStaffCollection,
   )
+  const { data: staff = [] } = useLiveQuery(staffCollection)
 
   // Create a map of case IDs to assignment counts
   const assignmentCounts = useMemo(() => {
@@ -50,6 +53,21 @@ export function MaintenanceCasesTable() {
     }
     return counts
   }, [assignments])
+
+  // Create a map of case IDs to staff names
+  const assignedStaffNames = useMemo(() => {
+    const names: Record<string, Array<string>> = {}
+    for (const assignment of assignments) {
+      const staffMember = staff.find((s) => s.id === assignment.staffId)
+      if (staffMember) {
+        names[assignment.caseId] = names[assignment.caseId] ?? []
+        names[assignment.caseId].push(
+          `${staffMember.firstName} ${staffMember.lastName}`,
+        )
+      }
+    }
+    return names
+  }, [assignments, staff])
 
   return (
     <Stack gap={4}>
@@ -146,10 +164,16 @@ export function MaintenanceCasesTable() {
                         </Table.Cell>
                         <Table.Cell>
                           {staffCount > 0 ? (
-                            <HStack gap={1}>
-                              <Users size={16} />
-                              <Text>{staffCount}</Text>
-                            </HStack>
+                            <Tooltip
+                              content={(
+                                assignedStaffNames[maintenanceCase.id] ?? []
+                              ).join(', ')}
+                            >
+                              <HStack gap={1}>
+                                <Users size={16} />
+                                <Text>{staffCount}</Text>
+                              </HStack>
+                            </Tooltip>
                           ) : (
                             <Badge colorPalette="gray" variant="subtle">
                               Keine Zuweisung

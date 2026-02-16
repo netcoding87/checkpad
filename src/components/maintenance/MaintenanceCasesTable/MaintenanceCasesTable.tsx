@@ -1,10 +1,3 @@
-import { Tooltip } from '@/components/ui/tooltip'
-import {
-  maintenanceCaseStaffCollection,
-  maintenanceCasesCollection,
-  staffCollection,
-} from '@/db/collections'
-import { toCommercial } from '@/utils/number'
 import {
   Badge,
   Box,
@@ -18,6 +11,13 @@ import {
 import { useLiveQuery } from '@tanstack/react-db'
 import { Users } from 'lucide-react'
 import { useMemo } from 'react'
+import { toCommercial } from '@/utils/number'
+import {
+  maintenanceCaseStaffCollection,
+  maintenanceCasesCollection,
+  staffCollection,
+} from '@/db/collections'
+import { Tooltip } from '@/components/ui/tooltip'
 
 function getStatus(maintenanceCase: {
   offerCreatedAt: Date | null

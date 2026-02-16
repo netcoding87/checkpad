@@ -1,11 +1,3 @@
-import { useColorModeValue } from '@/components/ui/color-mode'
-import { Tooltip } from '@/components/ui/tooltip'
-import type { MaintenanceCase } from '@/db/collections'
-import {
-  maintenanceCaseStaffCollection,
-  maintenanceCasesCollection,
-  staffCollection,
-} from '@/db/collections'
 import {
   Badge,
   Box,
@@ -24,6 +16,14 @@ import { gte, lte, useLiveQuery } from '@tanstack/react-db'
 import { Link } from '@tanstack/react-router'
 import { AlertCircle, ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import type { MaintenanceCase } from '@/db/collections'
+import {
+  maintenanceCaseStaffCollection,
+  maintenanceCasesCollection,
+  staffCollection,
+} from '@/db/collections'
+import { Tooltip } from '@/components/ui/tooltip'
+import { useColorModeValue } from '@/components/ui/color-mode'
 
 const DAY_MS = 24 * 60 * 60 * 1000
 const COLOR_PALETTE = [

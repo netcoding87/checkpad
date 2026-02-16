@@ -12,9 +12,24 @@ export function Header() {
   const linkHoverBg = useColorModeValue('gray.100', 'gray.800')
   const activeLinkBg = useColorModeValue('gray.200', 'gray.700')
   const [mounted, setMounted] = useState(false)
+  const [, forceUpdate] = useState({})
 
   useEffect(() => {
     setMounted(true)
+  }, [])
+
+  // Force re-render when page becomes visible (after laptop wake-up)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        forceUpdate({})
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [])
 
   const navItems = useMemo(

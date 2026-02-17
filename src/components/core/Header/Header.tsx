@@ -1,36 +1,15 @@
 import { Box, Flex, HStack, Heading, IconButton } from '@chakra-ui/react'
 import { Link } from '@tanstack/react-router'
 import { Moon, Plane, Sun } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useColorMode, useColorModeValue } from '@/components/ui/color-mode'
 
 export function Header() {
   const { colorMode, toggleColorMode } = useColorMode()
-  const headerBg = useColorModeValue('white', 'gray.900')
   const headerBorder = useColorModeValue('gray.200', 'gray.800')
   const textColor = useColorModeValue('gray.900', 'white')
   const linkHoverBg = useColorModeValue('gray.100', 'gray.800')
   const activeLinkBg = useColorModeValue('gray.200', 'gray.700')
-  const [mounted, setMounted] = useState(false)
-  const [, forceUpdate] = useState({})
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  // Force re-render when page becomes visible (after laptop wake-up)
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        forceUpdate({})
-      }
-    }
-
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-    }
-  }, [])
 
   const navItems = useMemo(
     () => [
@@ -44,7 +23,6 @@ export function Header() {
   return (
     <Box
       as="header"
-      bg={headerBg}
       borderBottom="2px"
       borderColor={headerBorder}
       px={6}
@@ -101,7 +79,7 @@ export function Header() {
           size="md"
           variant="ghost"
         >
-          {mounted && colorMode === 'dark' ? (
+          {colorMode === 'dark' ? (
             <Sun color="#fbbf24" size={24} />
           ) : (
             <Moon color="#64748b" size={24} />

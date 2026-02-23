@@ -12,9 +12,9 @@ export function StaffIndex() {
         <HStack justify="space-between">
           <Heading>Mitarbeiter</Heading>
           <Button
-            colorScheme="blue"
-            gap={2}
+            colorPalette="blue"
             onClick={() => navigate({ to: '/staff/new' })}
+            size="sm"
           >
             <LuPlus />
             Neuer Mitarbeiter

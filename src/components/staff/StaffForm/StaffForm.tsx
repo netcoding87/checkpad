@@ -266,33 +266,42 @@ export function StaffForm({
           </Fieldset.Content>
         </Fieldset.Root>
 
-        <ButtonGroup>
-          <Button
-            disabled={form.state.isSubmitting}
-            loadingText="Speichern..."
-            onClick={(e) => {
-              e.preventDefault()
-              form.handleSubmit()
-            }}
-            type="submit"
-            variant="solid"
-          >
-            {submitLabel}
-          </Button>
-          <Button onClick={handleClose} variant="outline">
-            Abbrechen
-          </Button>
-          {onDelete && (
-            <Button
-              colorPalette="red"
-              disabled={form.state.isSubmitting}
-              onClick={onDelete}
-              variant="ghost"
-            >
-              Löschen
+        <Stack direction="row" gap={3} justify="space-between">
+          <Stack direction="row" gap={3}>
+            {onDelete && (
+              <Button
+                colorPalette="red"
+                disabled={form.state.isSubmitting}
+                onClick={async () => {
+                  if (
+                    confirm(
+                      'Sind Sie sicher, dass Sie diesen Mitarbeiter löschen möchten?',
+                    )
+                  ) {
+                    await onDelete()
+                  }
+                }}
+                type="button"
+                variant="ghost"
+              >
+                Löschen
+              </Button>
+            )}
+          </Stack>
+          <Stack direction="row" gap={3}>
+            <Button onClick={handleClose} type="button" variant="ghost">
+              Schließen
             </Button>
-          )}
-        </ButtonGroup>
+            <Button
+              colorPalette="blue"
+              disabled={form.state.isSubmitting}
+              loadingText="Speichern..."
+              type="submit"
+            >
+              {submitLabel}
+            </Button>
+          </Stack>
+        </Stack>
       </Stack>
     </form>
   )

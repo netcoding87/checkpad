@@ -42,7 +42,7 @@ export function Header() {
             >
               <Plane color="#06b6d4" size={32} />
               <Heading as="h1" color={textColor} fontWeight="bold" size="lg">
-                check
+                EJS check
                 <Box as="span" fontStyle="italic">
                   PAD
                 </Box>

@@ -1,11 +1,22 @@
-import { Box, Flex, HStack, Heading, IconButton, Menu } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  Flex,
+  HStack,
+  Heading,
+  IconButton,
+  Menu,
+  Text,
+} from '@chakra-ui/react'
 import { Link } from '@tanstack/react-router'
 import { Check, Monitor, Moon, Plane, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
+import { authClient } from '@/lib/auth-client'
 import { useColorMode, useColorModeValue } from '@/components/ui/color-mode'
 
 export function Header() {
+  const { data: session } = authClient.useSession()
   const { colorMode } = useColorMode()
   const { theme, setTheme } = useTheme()
   const headerBorder = useColorModeValue('gray.200', 'gray.800')
@@ -74,41 +85,64 @@ export function Header() {
             ))}
           </HStack>
         </Flex>
-        <Menu.Root positioning={{ placement: 'bottom-end' }}>
-          <Menu.Trigger asChild>
-            <IconButton
-              aria-label="Theme selection"
-              color={textColor}
-              size="md"
-              variant="ghost"
-            >
-              {colorMode === 'dark' ? (
-                <Moon color="#fbbf24" size={24} />
-              ) : (
-                <Sun color="#64748b" size={24} />
-              )}
-            </IconButton>
-          </Menu.Trigger>
-          <Menu.Positioner>
-            <Menu.Content>
-              <Menu.Item onClick={() => setTheme('light')} value="light">
-                <Sun size={16} />
-                Light
-                {theme === 'light' && <Check size={16} />}
-              </Menu.Item>
-              <Menu.Item onClick={() => setTheme('dark')} value="dark">
-                <Moon size={16} />
-                Dark
-                {theme === 'dark' && <Check size={16} />}
-              </Menu.Item>
-              <Menu.Item onClick={() => setTheme('system')} value="system">
-                <Monitor size={16} />
-                System
-                {theme === 'system' && <Check size={16} />}
-              </Menu.Item>
-            </Menu.Content>
-          </Menu.Positioner>
-        </Menu.Root>
+        <HStack gap={3}>
+          {session ? (
+            <>
+              <Text color={textColor} fontWeight="medium">
+                {session.user.name}
+              </Text>
+              <Button
+                aria-label="Sign out"
+                onClick={() => authClient.signOut()}
+                size="sm"
+                variant="outline"
+              >
+                Sign out
+              </Button>
+            </>
+          ) : (
+            <Link style={{ textDecoration: 'none' }} to="/login">
+              <Button size="sm" variant="solid">
+                Sign in
+              </Button>
+            </Link>
+          )}
+          <Menu.Root positioning={{ placement: 'bottom-end' }}>
+            <Menu.Trigger asChild>
+              <IconButton
+                aria-label="Theme selection"
+                color={textColor}
+                size="md"
+                variant="ghost"
+              >
+                {colorMode === 'dark' ? (
+                  <Moon color="#fbbf24" size={24} />
+                ) : (
+                  <Sun color="#64748b" size={24} />
+                )}
+              </IconButton>
+            </Menu.Trigger>
+            <Menu.Positioner>
+              <Menu.Content>
+                <Menu.Item onClick={() => setTheme('light')} value="light">
+                  <Sun size={16} />
+                  Light
+                  {theme === 'light' && <Check size={16} />}
+                </Menu.Item>
+                <Menu.Item onClick={() => setTheme('dark')} value="dark">
+                  <Moon size={16} />
+                  Dark
+                  {theme === 'dark' && <Check size={16} />}
+                </Menu.Item>
+                <Menu.Item onClick={() => setTheme('system')} value="system">
+                  <Monitor size={16} />
+                  System
+                  {theme === 'system' && <Check size={16} />}
+                </Menu.Item>
+              </Menu.Content>
+            </Menu.Positioner>
+          </Menu.Root>
+        </HStack>
       </Flex>
     </Box>
   )

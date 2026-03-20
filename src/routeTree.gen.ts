@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StaffRouteImport } from './routes/staff'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as HangarRouteImport } from './routes/hangar'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StaffIndexRouteImport } from './routes/staff.index'
@@ -24,10 +25,16 @@ import { Route as ApiMaintenanceCaseStaffRouteImport } from './routes/api.mainte
 import { Route as ApiElectricStaffRouteImport } from './routes/api.electric.staff'
 import { Route as ApiElectricMaintenanceCasesRouteImport } from './routes/api.electric.maintenance-cases'
 import { Route as ApiElectricMaintenanceCaseStaffRouteImport } from './routes/api.electric.maintenance-case-staff'
+import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
 
 const StaffRoute = StaffRouteImport.update({
   id: '/staff',
   path: '/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HangarRoute = HangarRouteImport.update({
@@ -102,10 +109,16 @@ const ApiElectricMaintenanceCaseStaffRoute =
     path: '/api/electric/maintenance-case-staff',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/hangar': typeof HangarRouteWithChildren
+  '/login': typeof LoginRoute
   '/staff': typeof StaffRouteWithChildren
   '/api/maintenance-case-staff': typeof ApiMaintenanceCaseStaffRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
@@ -116,12 +129,14 @@ export interface FileRoutesByFullPath {
   '/staff/new': typeof StaffNewRoute
   '/hangar/': typeof HangarIndexRoute
   '/staff/': typeof StaffIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/electric/maintenance-case-staff': typeof ApiElectricMaintenanceCaseStaffRoute
   '/api/electric/maintenance-cases': typeof ApiElectricMaintenanceCasesRoute
   '/api/electric/staff': typeof ApiElectricStaffRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
   '/api/maintenance-case-staff': typeof ApiMaintenanceCaseStaffRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
   '/api/staff': typeof ApiStaffRoute
@@ -131,6 +146,7 @@ export interface FileRoutesByTo {
   '/staff/new': typeof StaffNewRoute
   '/hangar': typeof HangarIndexRoute
   '/staff': typeof StaffIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/electric/maintenance-case-staff': typeof ApiElectricMaintenanceCaseStaffRoute
   '/api/electric/maintenance-cases': typeof ApiElectricMaintenanceCasesRoute
   '/api/electric/staff': typeof ApiElectricStaffRoute
@@ -139,6 +155,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/hangar': typeof HangarRouteWithChildren
+  '/login': typeof LoginRoute
   '/staff': typeof StaffRouteWithChildren
   '/api/maintenance-case-staff': typeof ApiMaintenanceCaseStaffRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
@@ -149,6 +166,7 @@ export interface FileRoutesById {
   '/staff/new': typeof StaffNewRoute
   '/hangar/': typeof HangarIndexRoute
   '/staff/': typeof StaffIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/electric/maintenance-case-staff': typeof ApiElectricMaintenanceCaseStaffRoute
   '/api/electric/maintenance-cases': typeof ApiElectricMaintenanceCasesRoute
   '/api/electric/staff': typeof ApiElectricStaffRoute
@@ -158,6 +176,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/hangar'
+    | '/login'
     | '/staff'
     | '/api/maintenance-case-staff'
     | '/api/maintenance-cases'
@@ -168,12 +187,14 @@ export interface FileRouteTypes {
     | '/staff/new'
     | '/hangar/'
     | '/staff/'
+    | '/api/auth/$'
     | '/api/electric/maintenance-case-staff'
     | '/api/electric/maintenance-cases'
     | '/api/electric/staff'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/login'
     | '/api/maintenance-case-staff'
     | '/api/maintenance-cases'
     | '/api/staff'
@@ -183,6 +204,7 @@ export interface FileRouteTypes {
     | '/staff/new'
     | '/hangar'
     | '/staff'
+    | '/api/auth/$'
     | '/api/electric/maintenance-case-staff'
     | '/api/electric/maintenance-cases'
     | '/api/electric/staff'
@@ -190,6 +212,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/hangar'
+    | '/login'
     | '/staff'
     | '/api/maintenance-case-staff'
     | '/api/maintenance-cases'
@@ -200,6 +223,7 @@ export interface FileRouteTypes {
     | '/staff/new'
     | '/hangar/'
     | '/staff/'
+    | '/api/auth/$'
     | '/api/electric/maintenance-case-staff'
     | '/api/electric/maintenance-cases'
     | '/api/electric/staff'
@@ -208,10 +232,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HangarRoute: typeof HangarRouteWithChildren
+  LoginRoute: typeof LoginRoute
   StaffRoute: typeof StaffRouteWithChildren
   ApiMaintenanceCaseStaffRoute: typeof ApiMaintenanceCaseStaffRoute
   ApiMaintenanceCasesRoute: typeof ApiMaintenanceCasesRoute
   ApiStaffRoute: typeof ApiStaffRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiElectricMaintenanceCaseStaffRoute: typeof ApiElectricMaintenanceCaseStaffRoute
   ApiElectricMaintenanceCasesRoute: typeof ApiElectricMaintenanceCasesRoute
   ApiElectricStaffRoute: typeof ApiElectricStaffRoute
@@ -224,6 +250,13 @@ declare module '@tanstack/react-router' {
       path: '/staff'
       fullPath: '/staff'
       preLoaderRoute: typeof StaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hangar': {
@@ -324,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiElectricMaintenanceCaseStaffRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -359,10 +399,12 @@ const StaffRouteWithChildren = StaffRoute._addFileChildren(StaffRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HangarRoute: HangarRouteWithChildren,
+  LoginRoute: LoginRoute,
   StaffRoute: StaffRouteWithChildren,
   ApiMaintenanceCaseStaffRoute: ApiMaintenanceCaseStaffRoute,
   ApiMaintenanceCasesRoute: ApiMaintenanceCasesRoute,
   ApiStaffRoute: ApiStaffRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiElectricMaintenanceCaseStaffRoute: ApiElectricMaintenanceCaseStaffRoute,
   ApiElectricMaintenanceCasesRoute: ApiElectricMaintenanceCasesRoute,
   ApiElectricStaffRoute: ApiElectricStaffRoute,

@@ -1,8 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { eq } from 'drizzle-orm'
 import { db } from '@/db'
 import { getTxId } from '@/db/helper'
 import { staffTable } from '@/db/schema'
+import { requireApiSession } from '@/lib/auth-session'
+import { createFileRoute } from '@tanstack/react-router'
+import { eq, sql } from 'drizzle-orm'
 
 const parseTimestampFields = (
   data: Record<string, unknown>,
@@ -18,10 +19,21 @@ const parseTimestampFields = (
 }
 
 const handlePost = async ({ request }: { request: Request }) => {
+  const authResult = await requireApiSession(request)
+
+  if (authResult instanceof Response) {
+    return authResult
+  }
+
+  const actorId = authResult.session.user.id
   const body = await request.json()
   const parsedBody = parseTimestampFields(body)
 
   const txid = await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT set_config('app.current_user', ${actorId}, true)`,
+    )
+
     const currentTxid = await getTxId(tx)
     await tx.insert(staffTable).values(parsedBody as any)
     return currentTxid
@@ -34,6 +46,13 @@ const handlePost = async ({ request }: { request: Request }) => {
 }
 
 const handlePut = async ({ request }: { request: Request }) => {
+  const authResult = await requireApiSession(request)
+
+  if (authResult instanceof Response) {
+    return authResult
+  }
+
+  const actorId = authResult.session.user.id
   const body = await request.json()
   const { id, ...updates } = body
   const parsedUpdates = parseTimestampFields(updates)
@@ -46,6 +65,10 @@ const handlePut = async ({ request }: { request: Request }) => {
   }
 
   const txid = await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT set_config('app.current_user', ${actorId}, true)`,
+    )
+
     const currentTxid = await getTxId(tx)
     await tx
       .update(staffTable)
@@ -60,6 +83,13 @@ const handlePut = async ({ request }: { request: Request }) => {
 }
 
 const handleDelete = async ({ request }: { request: Request }) => {
+  const authResult = await requireApiSession(request)
+
+  if (authResult instanceof Response) {
+    return authResult
+  }
+
+  const actorId = authResult.session.user.id
   const body = await request.json()
   const { id } = body
 
@@ -71,6 +101,10 @@ const handleDelete = async ({ request }: { request: Request }) => {
   }
 
   const txid = await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT set_config('app.current_user', ${actorId}, true)`,
+    )
+
     const currentTxid = await getTxId(tx)
     await tx.delete(staffTable).where(eq(staffTable.id, id))
     return currentTxid

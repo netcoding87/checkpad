@@ -1,8 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { and, eq, inArray } from 'drizzle-orm'
+import { and, eq, inArray, sql } from 'drizzle-orm'
 import { db } from '@/db'
 import { getTxId } from '@/db/helper'
 import { maintenanceCaseStaffTable, maintenanceCasesTable } from '@/db/schema'
+import { requireApiSession } from '@/lib/auth-session'
 
 // Parse timestamp strings to Date objects
 const parseTimestampFields = (
@@ -29,11 +30,22 @@ const parseTimestampFields = (
 }
 
 const handlePost = async ({ request }: { request: Request }) => {
+  const authResult = await requireApiSession(request)
+
+  if (authResult instanceof Response) {
+    return authResult
+  }
+
+  const actorId = authResult.session.user.id
   const body = await request.json()
   const { staffIds = [], ...caseData } = body
   const parsedBody = parseTimestampFields(caseData)
 
   const txid = await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT set_config('app.current_user', ${actorId}, true)`,
+    )
+
     const currentTxid = await getTxId(tx)
     const [newCase] = await tx
       .insert(maintenanceCasesTable)
@@ -46,7 +58,7 @@ const handlePost = async ({ request }: { request: Request }) => {
         staffIds.map((staffId: string) => ({
           caseId: newCase.id,
           staffId,
-          assignedBy: 'system', // TODO: get from session/auth context
+          assignedBy: actorId,
         })),
       )
     }
@@ -61,6 +73,13 @@ const handlePost = async ({ request }: { request: Request }) => {
 }
 
 const handlePut = async ({ request }: { request: Request }) => {
+  const authResult = await requireApiSession(request)
+
+  if (authResult instanceof Response) {
+    return authResult
+  }
+
+  const actorId = authResult.session.user.id
   const body = await request.json()
   const { id, staffIds = [], ...updates } = body
   const parsedUpdates = parseTimestampFields(updates)
@@ -73,6 +92,10 @@ const handlePut = async ({ request }: { request: Request }) => {
   }
 
   const txid = await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT set_config('app.current_user', ${actorId}, true)`,
+    )
+
     const currentTxid = await getTxId(tx)
 
     // Update case data
@@ -116,7 +139,7 @@ const handlePut = async ({ request }: { request: Request }) => {
         staffToAdd.map((staffId: string) => ({
           caseId: id,
           staffId,
-          assignedBy: 'system', // TODO: get from session/auth context
+          assignedBy: actorId,
         })),
       )
     }
@@ -130,6 +153,13 @@ const handlePut = async ({ request }: { request: Request }) => {
 }
 
 const handleDelete = async ({ request }: { request: Request }) => {
+  const authResult = await requireApiSession(request)
+
+  if (authResult instanceof Response) {
+    return authResult
+  }
+
+  const actorId = authResult.session.user.id
   const body = await request.json()
   const { id } = body
 
@@ -141,6 +171,10 @@ const handleDelete = async ({ request }: { request: Request }) => {
   }
 
   const txid = await db.transaction(async (tx) => {
+    await tx.execute(
+      sql`SELECT set_config('app.current_user', ${actorId}, true)`,
+    )
+
     const currentTxid = await getTxId(tx)
     await tx
       .delete(maintenanceCasesTable)

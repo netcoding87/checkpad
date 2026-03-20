@@ -1,4 +1,11 @@
-import { auditLogTable, maintenanceCasesTable } from './schema'
+import {
+  accounts,
+  auditLogTable,
+  maintenanceCasesTable,
+  sessions,
+  users,
+  verifications,
+} from './schema'
 
 describe('Database Schema', () => {
   describe('maintenanceCases table', () => {
@@ -40,6 +47,15 @@ describe('Database Schema', () => {
       expect(columns).toContain('newValue')
       expect(columns).toContain('changedBy')
       expect(columns).toContain('changedAt')
+    })
+  })
+
+  describe('better-auth tables', () => {
+    it('exports users, sessions, accounts, and verifications table definitions', () => {
+      expect(users).toBeDefined()
+      expect(sessions).toBeDefined()
+      expect(accounts).toBeDefined()
+      expect(verifications).toBeDefined()
     })
   })
 })

@@ -45,9 +45,9 @@ services:
       - -v
       - keycloak_db_password=${KEYCLOAK_DB_PASSWORD}
       - -f
-      - /bootstrap.sql
+      - /scripts/bootstrap-infra.sql
     volumes:
-      - ./scripts/db/bootstrap-infra.sql:/bootstrap.sql:ro
+      - ./scripts/db:/scripts:ro
     depends_on:
       checkpad-postgres:
         condition: service_healthy

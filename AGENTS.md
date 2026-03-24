@@ -1,6 +1,6 @@
 # AGENTS.md
 
-**Last Updated:** March 19, 2026
+**Last Updated:** March 24, 2026
 
 This document serves as a living guide for AI agents working on the checkPAD project. It should be updated whenever significant changes occur in architecture, dependencies, or conventions.
 
@@ -150,17 +150,20 @@ vitest related --run  # Run tests related to changed files
 1. Copy `.env.example` to `.env`
 2. Start services: `docker compose up -d`
 3. Install dependencies: `npm install`
-4. Bootstrap DB infrastructure (roles + DBs): `npm run db:bootstrap`
-5. Generate DB schema: `npm run db:generate`
-6. Push app schema to DB: `npm run db:push`
-7. Start dev server: `npm run dev` (port 5371)
-8. Sign in through Keycloak using the imported dev realm user:
+4. Generate DB schema: `npm run db:generate`
+5. Push app schema to DB: `npm run db:push`
+6. Start dev server: `npm run dev` (port 5371)
+7. Sign in through Keycloak using the imported dev realm user:
    - Username: `elite.jet`
    - Password: `1234test`
+
+`docker compose up -d` runs the `db-bootstrap` one-shot service automatically.
+Run `npm run db:bootstrap` manually only when infrastructure is not managed by Compose.
 
 **Docker Services:**
 
 - **PostgreSQL** (port 5432): Main database
+- **db-bootstrap**: One-shot role/database bootstrap service (idempotent)
 - **pgAdmin** (port 5050): Database management UI
 - **ElectricSQL** (port 3000): Sync service
 - **Keycloak** (port 9090): Development identity provider with imported `checkpad` realm
@@ -275,7 +278,7 @@ The legacy `todos` table has been removed in favor of maintenance case tracking 
 
 **Workflow:**
 
-1. Ensure DB infrastructure exists: `npm run db:bootstrap`
+1. Ensure DB infrastructure exists (`npm run db:bootstrap` if not using Compose-managed bootstrap)
 2. Modify `src/db/schema.ts`
 3. Generate migration: `npm run db:generate`
 4. Apply migration: `npm run db:migrate` (production) or `npm run db:push` (dev)
@@ -407,6 +410,8 @@ This Dockerfile is compatible with [Coolify](https://coolify.io/) for self-hoste
 - Coolify will auto-detect and build the Dockerfile
 - Health checks are configured (GET / every 30s)
 - No special configuration required - Coolify handles orchestration
+
+For Compose-based deployments, `db-bootstrap` runs as an idempotent one-shot service and both `keycloak` and `electric` wait for successful completion.
 
 **Optional: Database Migrations on Deploy**
 

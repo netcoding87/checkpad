@@ -23,6 +23,35 @@ services:
       timeout: 5s
       retries: 5
 
+  db-bootstrap:
+    image: postgres:18-alpine
+    container_name: checkpad-db-bootstrap
+    restart: 'no'
+    entrypoint:
+      - psql
+      - postgresql://${POSTGRES_ADMIN_USER}:${POSTGRES_ADMIN_PASSWORD}@checkpad-postgres:5432/postgres
+      - -v
+      - ON_ERROR_STOP=1
+      - -v
+      - app_db_name=${APP_DB_NAME}
+      - -v
+      - app_db_user=${APP_DB_USER}
+      - -v
+      - app_db_password=${APP_DB_PASSWORD}
+      - -v
+      - keycloak_db_name=${KEYCLOAK_DB_NAME}
+      - -v
+      - keycloak_db_user=${KEYCLOAK_DB_USER}
+      - -v
+      - keycloak_db_password=${KEYCLOAK_DB_PASSWORD}
+      - -f
+      - /bootstrap.sql
+    volumes:
+      - ./scripts/db/bootstrap-infra.sql:/bootstrap.sql:ro
+    depends_on:
+      checkpad-postgres:
+        condition: service_healthy
+
   electric:
     image: docker.io/electricsql/electric:latest
     container_name: checkpad-electric
@@ -37,6 +66,8 @@ services:
     depends_on:
       checkpad-postgres:
         condition: service_healthy
+      db-bootstrap:
+        condition: service_completed_successfully
     healthcheck:
       test: ['CMD-SHELL', 'curl -fsS http://localhost:3000/v1/health || exit 1']
       interval: 10s
@@ -79,6 +110,8 @@ services:
     depends_on:
       checkpad-postgres:
         condition: service_healthy
+      db-bootstrap:
+        condition: service_completed_successfully
     healthcheck:
       test: ['CMD-SHELL', '/usr/bin/bash -lc "exec 3<>/dev/tcp/127.0.0.1/8080"']
       interval: 10s

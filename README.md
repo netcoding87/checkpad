@@ -118,18 +118,23 @@ checkpad/
 
    This starts:
    - PostgreSQL (port 5432)
-   - pgAdmin (port 5050)
-   - ElectricSQL (port 3000)
-   - Keycloak (port 9090)
+
+- db-bootstrap (one-shot initialization of roles/databases)
+- pgAdmin (port 5050)
+- ElectricSQL (port 3000)
+- Keycloak (port 9090)
 
 5. **Initialize database**
 
-   ```bash
-    npm run db:bootstrap  # Create/repair DB infrastructure (roles + DBs)
-    npm run db:generate   # Generate migrations from schema
-    npm run db:push       # Apply app schema to app database
-    npm run db:seed       # Seed the database with initial data (optional)
-   ```
+The Compose stack runs database bootstrap automatically via the `db-bootstrap` service.
+
+```bash
+ npm run db:generate   # Generate migrations from schema
+ npm run db:push       # Apply app schema to app database
+ npm run db:seed       # Seed the database with initial data (optional)
+```
+
+    Run `npm run db:bootstrap` manually only if you are not using Docker Compose for infrastructure.
 
 6. **Start development server**
 
@@ -249,6 +254,8 @@ KEYCLOAK_SUPER_ADMIN_PASSWORD=1234test
 ### Keycloak First-Start Behavior
 
 The Keycloak realm is generated from environment variables and imported on startup.
+
+When started through Docker Compose, Keycloak waits until `db-bootstrap` completed successfully, ensuring Keycloak DB/user prerequisites exist before startup.
 
 - On first startup (or with a fresh Keycloak database), import creates the realm, client, and configured super-admin user.
 - On subsequent startups with the same Keycloak database, import keeps existing data and does not overwrite users or passwords.
@@ -426,7 +433,7 @@ The previous `todos` table has been removed in favor of maintenance case trackin
 ### Migration Workflow
 
 ```bash
-# 1. Ensure DB infrastructure exists (safe on fresh and existing systems)
+# 1. Ensure DB infrastructure exists (needed when infra is not bootstrapped by Compose)
 npm run db:bootstrap
 
 # 2. Generate migration from schema changes
@@ -565,6 +572,8 @@ import { Dashboard } from '../../components/maintenance/Dashboard'
 ### Docker / Coolify (Self-Hosted)
 
 The application is containerized and ready for self-hosting platforms like [Coolify](https://coolify.io/).
+
+For Compose-based deployments, the stack includes an idempotent `db-bootstrap` one-shot service. `keycloak` and `electric` depend on its successful completion.
 
 ```bash
 # Build Docker image

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-**Last Updated:** December 16, 2025
+**Last Updated:** March 19, 2026
 
 This document serves as a living guide for AI agents working on the checkPAD project. It should be updated whenever significant changes occur in architecture, dependencies, or conventions.
 
@@ -10,7 +10,7 @@ This document serves as a living guide for AI agents working on the checkPAD pro
 
 ## Project Overview
 
-**checkPAD** is a modern full-stack web application built with TanStack Start (React-based meta-framework) and PostgreSQL. The application uses local-first architecture with ElectricSQL for real-time data synchronization.
+**checkPAD** is a modern full-stack web application built with TanStack Start (React-based meta-framework) and PostgreSQL. The application uses local-first architecture with ElectricSQL for real-time data synchronization and authenticates users with Keycloak via better-auth.
 
 ### Tech Stack
 
@@ -19,6 +19,7 @@ This document serves as a living guide for AI agents working on the checkPAD pro
 - **Language:** TypeScript (strict mode)
 - **Database:** PostgreSQL 18 (Alpine)
 - **ORM:** Drizzle ORM
+- **Authentication:** better-auth + Keycloak (OIDC)
 - **Styling:** Chakra UI v3
 - **Routing:** TanStack Router (flat file-based)
 - **State Management:** TanStack React DB, TanStack React Form, TanStack React Table
@@ -34,6 +35,7 @@ This document serves as a living guide for AI agents working on the checkPAD pro
 - **Full-stack SSR application** with local-first capabilities
 - React Server Components architecture via TanStack Start
 - ElectricSQL for local-first sync between Postgres and client
+- better-auth mounted on TanStack Start server routes for cookie-based sessions
 
 ### Project Structure
 
@@ -52,13 +54,16 @@ checkpad/
 │   │   └── ui/              # UI primitives and providers (Chakra UI)
 │   ├── db/
 │   │   ├── schema.ts        # Drizzle database schema
+│   │   ├── auth-schema.ts   # Generated Better Auth schema
 │   │   └── index.ts         # Database client setup
 │   ├── db-collections/      # ElectricSQL collections
 │   ├── hooks/               # Custom React hooks
 │   ├── integrations/        # External service integrations
+│   ├── lib/                 # Auth config, auth client, server session helpers
 │   ├── router.ts            # Router configuration
 │   └── routeTree.gen.ts     # Auto-generated (DO NOT EDIT)
 ├── public/                  # Static assets
+├── keycloak/                # Local Keycloak realm import for development
 ├── drizzle/                 # Migration files (generated)
 └── docker-compose.yml       # Local development services
 ```
@@ -77,11 +82,22 @@ checkpad/
 3. **Database-First:** Schema defined in `src/db/schema.ts`, migrations via Drizzle Kit
 4. **Local-First Sync:** ElectricSQL for real-time data synchronization
 5. **Hangar Calendar:** `/hangar` renders maintenance cases across the full year with `useLiveQuery(maintenanceCasesCollection)` and unique per-case coloring.
+6. **Automatic Authentication:** Unauthenticated users are automatically redirected to Keycloak login via the `AuthInitializer` component at the root level. The app shows a loading spinner while checking the session. All application routes and `/api/...` data endpoints require a valid better-auth session.
+
+### Authentication Flow
+
+- When app loads, `AuthInitializer` checks if a session exists
+- **If authenticated:** Session is valid, layout and routes render normally
+- **If unauthenticated:** User is redirected to Keycloak login with the original URL preserved
+- **After login:** Keycloak redirects back to the app with an auth code, session is established
+- **Logout:** Clicking "Sign out" resolves a Keycloak logout URL with post-logout redirect, clears the session, and sends the user back to the app so they are immediately redirected to Keycloak login
+- No dedicated `/login` route or "Sign in" button exists
 
 ### Data API Endpoints
 
 - Reads (ElectricSQL proxy): `/api/electric/maintenance-cases`
 - Mutations (direct Postgres with txid): `/api/maintenance-cases` (POST/PUT/DELETE)
+- Auth handler: `/api/auth/$`
 
 ---
 
@@ -103,7 +119,7 @@ npm run test          # Run all tests
 vitest related --run  # Run tests related to changed files
 ```
 
-**Current State:** Test infrastructure is configured but test files are not yet present. When adding features, create corresponding test files first.
+**Current State:** Test infrastructure is active and new features should begin with focused tests before implementation.
 
 ### Git Workflow
 
@@ -134,15 +150,20 @@ vitest related --run  # Run tests related to changed files
 1. Copy `.env.example` to `.env`
 2. Start services: `docker compose up -d`
 3. Install dependencies: `npm install`
-4. Generate DB schema: `npm run db:generate`
-5. Push to DB: `npm run db:push`
-6. Start dev server: `npm run dev` (port 3000)
+4. Bootstrap DB infrastructure (roles + DBs): `npm run db:bootstrap`
+5. Generate DB schema: `npm run db:generate`
+6. Push app schema to DB: `npm run db:push`
+7. Start dev server: `npm run dev` (port 5371)
+8. Sign in through Keycloak using the imported dev realm user:
+   - Username: `elite.jet`
+   - Password: `1234test`
 
 **Docker Services:**
 
 - **PostgreSQL** (port 5432): Main database
 - **pgAdmin** (port 5050): Database management UI
 - **ElectricSQL** (port 3000): Sync service
+- **Keycloak** (port 9090): Development identity provider with imported `checkpad` realm
 
 ---
 
@@ -254,10 +275,11 @@ The legacy `todos` table has been removed in favor of maintenance case tracking 
 
 **Workflow:**
 
-1. Modify `src/db/schema.ts`
-2. Generate migration: `npm run db:generate`
-3. Apply migration: `npm run db:migrate` (production) or `npm run db:push` (dev)
-4. Optionally open Drizzle Studio: `npm run db:studio`
+1. Ensure DB infrastructure exists: `npm run db:bootstrap`
+2. Modify `src/db/schema.ts`
+3. Generate migration: `npm run db:generate`
+4. Apply migration: `npm run db:migrate` (production) or `npm run db:push` (dev)
+5. Optionally open Drizzle Studio: `npm run db:studio`
 
 ### Seeding
 
@@ -268,6 +290,11 @@ The legacy `todos` table has been removed in favor of maintenance case tracking 
 
 - Local: `postgresql://checkpad:checkpad_dev_password@localhost:5432/checkpad`
 - Configured via `DATABASE_URL` in `.env`
+
+**Auth Tables:**
+
+- Better Auth tables (`users`, `sessions`, `accounts`, `verifications`) are generated into `src/db/auth-schema.ts` and re-exported via `src/db/schema.ts`.
+- Regenerate them with `npx auth@latest generate --config src/lib/auth.ts --output src/db/auth-schema.ts --yes` after changing better-auth plugins or auth schema behavior.
 
 ---
 
@@ -303,6 +330,7 @@ The legacy `todos` table has been removed in favor of maintenance case tracking 
 
 - Use `/api/electric/...` for ElectricSQL proxied reads (collections `shapeOptions.url`).
 - Use `/api/...` for app-owned mutations that return `{ txid }` (collections `onInsert/onUpdate/onDelete`).
+- Both Electric and app-owned routes are protected with request-session checks in `src/lib/auth-session.ts`.
 
 **Important:** Route files should be `.ts` files that import components from `src/components/`, not `.tsx` files with inline components.
 
@@ -349,6 +377,12 @@ docker run -p 3000:3000 \
 - `DATABASE_URL`: PostgreSQL connection string (required)
 - `NODE_ENV`: Set to `production` in deployed environments
 - `PORT`: Server port (defaults to 3000)
+- `BETTER_AUTH_URL`: Public app URL used by better-auth callbacks
+- `VITE_BETTER_AUTH_URL`: Client-side auth base URL (typically same as `BETTER_AUTH_URL`)
+- `BETTER_AUTH_SECRET`: Secret used to sign/encrypt auth session data
+- `KEYCLOAK_ISSUER`: Keycloak realm issuer URL
+- `KEYCLOAK_CLIENT_ID`: OIDC client ID registered in Keycloak
+- `KEYCLOAK_CLIENT_SECRET`: OIDC client secret registered in Keycloak
 
 **Coolify Integration:**
 
@@ -397,6 +431,8 @@ node .output/server/index.mjs
 
 - **@tanstack/react-start:** Meta-framework for React SSR
 - **@tanstack/react-router:** File-based routing with type safety
+- **better-auth:** Authentication framework used for sessions and OAuth/OIDC flows
+- **@better-auth/drizzle-adapter:** Drizzle adapter for persisted auth tables
 - **drizzle-orm + drizzle-kit:** Type-safe SQL ORM
 - **@tanstack/electric-db-collection:** ElectricSQL integration
 - **@chakra-ui/react:** UI component library
@@ -507,6 +543,7 @@ If routes aren't updating:
 8. **Database changes** require migration generation
 9. **ElectricSQL** is used for local-first sync - consider offline scenarios
 10. **React 19** is used - be aware of breaking changes from earlier versions
+11. **Auth is mandatory** - new routes and server handlers should be protected by default unless explicitly public
 
 ---
 

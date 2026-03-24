@@ -1,5 +1,5 @@
-import { auth } from '@/lib/auth'
 import { createFileRoute } from '@tanstack/react-router'
+import { auth } from '@/lib/auth'
 
 const handleAuth = async ({ request }: { request: Request }) => {
   return auth.handler(request)

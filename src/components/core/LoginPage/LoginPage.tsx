@@ -14,7 +14,7 @@ export function LoginPage() {
 
   return (
     <Box mx="auto" mt={24} px={6} width="full" maxW="lg">
-      <Stack borderRadius="xl" borderWidth="1px" p={8} shadow="lg" spacing={6}>
+      <Stack borderRadius="xl" borderWidth="1px" gap={6} p={8} shadow="lg">
         <Heading size="lg">Sign In to checkPAD</Heading>
         <Text color="fg.muted">
           Access is restricted to authorized users. Continue with Keycloak.

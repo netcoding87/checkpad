@@ -1,3 +1,4 @@
+import { waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -5,10 +6,13 @@ import { Header } from './Header'
 import type { ReactNode } from 'react'
 import { render, screen } from '@/test/utils'
 
-const { signOutMock, useSessionMock } = vi.hoisted(() => ({
+const { fetchMock, signOutMock, useSessionMock } = vi.hoisted(() => ({
+  fetchMock: vi.fn(),
   signOutMock: vi.fn(),
   useSessionMock: vi.fn(),
 }))
+
+vi.stubGlobal('fetch', fetchMock)
 
 vi.mock('@/lib/auth-client', () => ({
   authClient: {
@@ -35,8 +39,14 @@ vi.mock('@tanstack/react-router', () => ({
 
 describe('Header', () => {
   beforeEach(() => {
+    fetchMock.mockReset()
     signOutMock.mockReset()
     useSessionMock.mockReset()
+    fetchMock.mockResolvedValue({
+      json: () =>
+        Promise.resolve({ logoutUrl: 'http://localhost:9090/logout' }),
+      ok: true,
+    })
   })
 
   it('is a function component', () => {
@@ -47,12 +57,14 @@ describe('Header', () => {
     expect(Header).toBeDefined()
   })
 
-  it('shows login link when no session is available', () => {
+  it('does not show sign in button when no session is available', () => {
     useSessionMock.mockReturnValue({ data: null, isPending: false })
 
     render(<Header />)
 
-    expect(screen.getByRole('link', { name: 'Sign in' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Sign in' }),
+    ).not.toBeInTheDocument()
   })
 
   it('shows user name and allows sign out when session is available', async () => {
@@ -69,6 +81,16 @@ describe('Header', () => {
 
     await userEvent.click(screen.getByRole('button', { name: 'Sign out' }))
 
-    expect(signOutMock).toHaveBeenCalled()
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledTimes(1)
+
+      const [request] = fetchMock.mock.calls[0] as [Request]
+
+      expect(request).toBeInstanceOf(Request)
+      expect(request.method).toBe('POST')
+      expect(request.url).toContain('/api/auth/keycloak-logout')
+      expect(request.credentials).toBe('include')
+      expect(signOutMock).toHaveBeenCalled()
+    })
   })
 })

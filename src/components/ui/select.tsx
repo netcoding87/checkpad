@@ -190,7 +190,6 @@ const Select = <T,>(
 
   const listBgColor = useColorModeValue('white', 'gray.900')
   const highlightBgColor = useColorModeValue('blue.500', 'blue.700')
-  const highlightTextColor = useColorModeValue('white', 'white')
 
   const highlight = (item: SelectOption<T>, index: number) =>
     highlightedIndex === index ||
@@ -378,7 +377,6 @@ const Select = <T,>(
                     bgColor={
                       highlight(item, index) ? highlightBgColor : 'inherit'
                     }
-                    highlightTextColor
                     color={highlight(item, index) ? 'white' : 'inherit'}
                     key={item.value}
                     px={4}

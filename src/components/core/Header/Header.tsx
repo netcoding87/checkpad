@@ -33,6 +33,32 @@ export function Header() {
     [],
   )
 
+  const handleSignOut = async () => {
+    let logoutUrl = window.location.origin
+
+    try {
+      const keycloakLogoutResponse = await fetch('/api/auth/keycloak-logout', {
+        credentials: 'include',
+        method: 'POST',
+      })
+
+      if (keycloakLogoutResponse.ok) {
+        const payload = (await keycloakLogoutResponse.json()) as {
+          logoutUrl?: string
+        }
+
+        if (payload.logoutUrl) {
+          logoutUrl = payload.logoutUrl
+        }
+      }
+    } catch {
+      // Fall back to app origin when Keycloak logout URL cannot be resolved.
+    }
+
+    await authClient.signOut()
+    window.location.assign(logoutUrl)
+  }
+
   return (
     <Box
       as="header"
@@ -86,26 +112,20 @@ export function Header() {
           </HStack>
         </Flex>
         <HStack gap={3}>
-          {session ? (
+          {session && (
             <>
               <Text color={textColor} fontWeight="medium">
                 {session.user.name}
               </Text>
               <Button
                 aria-label="Sign out"
-                onClick={() => authClient.signOut()}
+                onClick={handleSignOut}
                 size="sm"
                 variant="outline"
               >
                 Sign out
               </Button>
             </>
-          ) : (
-            <Link style={{ textDecoration: 'none' }} to="/login">
-              <Button size="sm" variant="solid">
-                Sign in
-              </Button>
-            </Link>
           )}
           <Menu.Root positioning={{ placement: 'bottom-end' }}>
             <Menu.Trigger asChild>

@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as StaffRouteImport } from './routes/staff'
-import { Route as LoginRouteImport } from './routes/login'
 import { Route as HangarRouteImport } from './routes/hangar'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as StaffIndexRouteImport } from './routes/staff.index'
@@ -25,16 +24,12 @@ import { Route as ApiMaintenanceCaseStaffRouteImport } from './routes/api.mainte
 import { Route as ApiElectricStaffRouteImport } from './routes/api.electric.staff'
 import { Route as ApiElectricMaintenanceCasesRouteImport } from './routes/api.electric.maintenance-cases'
 import { Route as ApiElectricMaintenanceCaseStaffRouteImport } from './routes/api.electric.maintenance-case-staff'
+import { Route as ApiAuthKeycloakLogoutRouteImport } from './routes/api.auth.keycloak-logout'
 import { Route as ApiAuthSplatRouteImport } from './routes/api.auth.$'
 
 const StaffRoute = StaffRouteImport.update({
   id: '/staff',
   path: '/staff',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HangarRoute = HangarRouteImport.update({
@@ -109,6 +104,11 @@ const ApiElectricMaintenanceCaseStaffRoute =
     path: '/api/electric/maintenance-case-staff',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAuthKeycloakLogoutRoute = ApiAuthKeycloakLogoutRouteImport.update({
+  id: '/api/auth/keycloak-logout',
+  path: '/api/auth/keycloak-logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -118,7 +118,6 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/hangar': typeof HangarRouteWithChildren
-  '/login': typeof LoginRoute
   '/staff': typeof StaffRouteWithChildren
   '/api/maintenance-case-staff': typeof ApiMaintenanceCaseStaffRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
@@ -130,13 +129,13 @@ export interface FileRoutesByFullPath {
   '/hangar/': typeof HangarIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/keycloak-logout': typeof ApiAuthKeycloakLogoutRoute
   '/api/electric/maintenance-case-staff': typeof ApiElectricMaintenanceCaseStaffRoute
   '/api/electric/maintenance-cases': typeof ApiElectricMaintenanceCasesRoute
   '/api/electric/staff': typeof ApiElectricStaffRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/login': typeof LoginRoute
   '/api/maintenance-case-staff': typeof ApiMaintenanceCaseStaffRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
   '/api/staff': typeof ApiStaffRoute
@@ -147,6 +146,7 @@ export interface FileRoutesByTo {
   '/hangar': typeof HangarIndexRoute
   '/staff': typeof StaffIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/keycloak-logout': typeof ApiAuthKeycloakLogoutRoute
   '/api/electric/maintenance-case-staff': typeof ApiElectricMaintenanceCaseStaffRoute
   '/api/electric/maintenance-cases': typeof ApiElectricMaintenanceCasesRoute
   '/api/electric/staff': typeof ApiElectricStaffRoute
@@ -155,7 +155,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/hangar': typeof HangarRouteWithChildren
-  '/login': typeof LoginRoute
   '/staff': typeof StaffRouteWithChildren
   '/api/maintenance-case-staff': typeof ApiMaintenanceCaseStaffRoute
   '/api/maintenance-cases': typeof ApiMaintenanceCasesRoute
@@ -167,6 +166,7 @@ export interface FileRoutesById {
   '/hangar/': typeof HangarIndexRoute
   '/staff/': typeof StaffIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/keycloak-logout': typeof ApiAuthKeycloakLogoutRoute
   '/api/electric/maintenance-case-staff': typeof ApiElectricMaintenanceCaseStaffRoute
   '/api/electric/maintenance-cases': typeof ApiElectricMaintenanceCasesRoute
   '/api/electric/staff': typeof ApiElectricStaffRoute
@@ -176,7 +176,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/hangar'
-    | '/login'
     | '/staff'
     | '/api/maintenance-case-staff'
     | '/api/maintenance-cases'
@@ -188,13 +187,13 @@ export interface FileRouteTypes {
     | '/hangar/'
     | '/staff/'
     | '/api/auth/$'
+    | '/api/auth/keycloak-logout'
     | '/api/electric/maintenance-case-staff'
     | '/api/electric/maintenance-cases'
     | '/api/electric/staff'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/login'
     | '/api/maintenance-case-staff'
     | '/api/maintenance-cases'
     | '/api/staff'
@@ -205,6 +204,7 @@ export interface FileRouteTypes {
     | '/hangar'
     | '/staff'
     | '/api/auth/$'
+    | '/api/auth/keycloak-logout'
     | '/api/electric/maintenance-case-staff'
     | '/api/electric/maintenance-cases'
     | '/api/electric/staff'
@@ -212,7 +212,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/hangar'
-    | '/login'
     | '/staff'
     | '/api/maintenance-case-staff'
     | '/api/maintenance-cases'
@@ -224,6 +223,7 @@ export interface FileRouteTypes {
     | '/hangar/'
     | '/staff/'
     | '/api/auth/$'
+    | '/api/auth/keycloak-logout'
     | '/api/electric/maintenance-case-staff'
     | '/api/electric/maintenance-cases'
     | '/api/electric/staff'
@@ -232,12 +232,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   HangarRoute: typeof HangarRouteWithChildren
-  LoginRoute: typeof LoginRoute
   StaffRoute: typeof StaffRouteWithChildren
   ApiMaintenanceCaseStaffRoute: typeof ApiMaintenanceCaseStaffRoute
   ApiMaintenanceCasesRoute: typeof ApiMaintenanceCasesRoute
   ApiStaffRoute: typeof ApiStaffRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiAuthKeycloakLogoutRoute: typeof ApiAuthKeycloakLogoutRoute
   ApiElectricMaintenanceCaseStaffRoute: typeof ApiElectricMaintenanceCaseStaffRoute
   ApiElectricMaintenanceCasesRoute: typeof ApiElectricMaintenanceCasesRoute
   ApiElectricStaffRoute: typeof ApiElectricStaffRoute
@@ -250,13 +250,6 @@ declare module '@tanstack/react-router' {
       path: '/staff'
       fullPath: '/staff'
       preLoaderRoute: typeof StaffRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hangar': {
@@ -357,6 +350,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiElectricMaintenanceCaseStaffRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/keycloak-logout': {
+      id: '/api/auth/keycloak-logout'
+      path: '/api/auth/keycloak-logout'
+      fullPath: '/api/auth/keycloak-logout'
+      preLoaderRoute: typeof ApiAuthKeycloakLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -399,12 +399,12 @@ const StaffRouteWithChildren = StaffRoute._addFileChildren(StaffRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   HangarRoute: HangarRouteWithChildren,
-  LoginRoute: LoginRoute,
   StaffRoute: StaffRouteWithChildren,
   ApiMaintenanceCaseStaffRoute: ApiMaintenanceCaseStaffRoute,
   ApiMaintenanceCasesRoute: ApiMaintenanceCasesRoute,
   ApiStaffRoute: ApiStaffRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiAuthKeycloakLogoutRoute: ApiAuthKeycloakLogoutRoute,
   ApiElectricMaintenanceCaseStaffRoute: ApiElectricMaintenanceCaseStaffRoute,
   ApiElectricMaintenanceCasesRoute: ApiElectricMaintenanceCasesRoute,
   ApiElectricStaffRoute: ApiElectricStaffRoute,

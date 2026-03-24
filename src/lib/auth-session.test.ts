@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { getSessionFromRequest, requireApiSession } from '@/lib/auth-session'
+
 const { getSessionMock } = vi.hoisted(() => ({
   getSessionMock: vi.fn(),
 }))
@@ -11,8 +13,6 @@ vi.mock('@/lib/auth', () => ({
     },
   },
 }))
-
-import { getSessionFromRequest, requireApiSession } from '@/lib/auth-session'
 
 describe('auth session helpers', () => {
   beforeEach(() => {

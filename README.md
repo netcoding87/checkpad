@@ -1,8 +1,8 @@
 # checkPAD
 
-> A modern, local-first full-stack application built with TanStack Start and PostgreSQL
+> A modern, local-first full-stack application built with TanStack Start, PostgreSQL, better-auth, and Keycloak
 
-**checkPAD** is a full-stack web application featuring real-time data synchronization, server-side rendering, and a local-first architecture powered by ElectricSQL.
+**checkPAD** is a full-stack web application featuring real-time data synchronization, server-side rendering, cookie-based authentication with better-auth, and a local-first architecture powered by ElectricSQL.
 
 ---
 
@@ -46,6 +46,7 @@
 - **Type Safety**: End-to-end TypeScript with strict mode enabled
 - **File-Based Routing**: Flat file-based convention with auto-generated route trees
 - **Database-First**: Schema-driven development with Drizzle ORM migrations
+- **Authenticated by Default**: App routes and data APIs require a valid better-auth session backed by Keycloak
 
 ---
 
@@ -64,13 +65,16 @@ checkpad/
 │   │   └── ui/              # Chakra UI providers & primitives
 │   ├── db/
 │   │   ├── schema.ts        # Drizzle database schema
+│   │   ├── auth-schema.ts   # Generated Better Auth schema
 │   │   └── index.ts         # Database client
+│   ├── lib/                 # Auth config, client, and server session helpers
 │   ├── db-collections/      # ElectricSQL collections
 │   ├── hooks/               # Custom React hooks
 │   ├── integrations/        # External service integrations
 │   ├── router.ts            # Router configuration
 │   └── routeTree.gen.ts     # Auto-generated (DO NOT EDIT)
 ├── public/                  # Static assets
+├── keycloak/                # Development realm import
 ├── drizzle/                 # Database migrations
 └── docker-compose.yml       # Local development services
 ```
@@ -116,19 +120,30 @@ checkpad/
    - PostgreSQL (port 5432)
    - pgAdmin (port 5050)
    - ElectricSQL (port 3000)
+   - Keycloak (port 9090)
 
 5. **Initialize database**
 
    ```bash
-   npm run db:generate  # Generate migrations from schema
-   npm run db:push      # Apply migrations to database
+    npm run db:bootstrap  # Create/repair DB infrastructure (roles + DBs)
+    npm run db:generate   # Generate migrations from schema
+    npm run db:push       # Apply app schema to app database
+    npm run db:seed       # Seed the database with initial data (optional)
    ```
 
 6. **Start development server**
+
    ```bash
    npm run dev
    ```
-   Application runs at [http://localhost:3000](http://localhost:3000)
+
+Application runs at [http://localhost:5371](http://localhost:5371)
+
+7. **Sign in with the local Keycloak realm**
+
+   Initial super-admin credentials are taken from `.env`:
+   - Username: `KEYCLOAK_SUPER_ADMIN_USERNAME`
+   - Password: `KEYCLOAK_SUPER_ADMIN_PASSWORD`
 
 ---
 
@@ -159,6 +174,100 @@ vitest related --run
 2. Implement feature to pass test
 3. Refactor while keeping tests green
 4. Commit (tests run automatically via Husky)
+
+### Auth Test Coverage Added
+
+- Session helper unit tests for authenticated and unauthenticated API requests
+- Login page tests for Keycloak OAuth start flow and redirect handling
+- Header tests for authenticated vs unauthenticated shell actions
+- Schema tests verifying Better Auth table exports
+
+---
+
+## 🔐 Authentication
+
+Authentication is provided by **better-auth** with **Keycloak** as the OIDC identity provider. The app implements an automatic authentication flow with no dedicated login page.
+
+### Auth Flow
+
+1. **Anonymous Users**: When a user is not authenticated, a loading spinner is shown while the session is checked
+2. **Session Check**: The `AuthInitializer` component verifies if the user has a valid session
+3. **Keycloak Redirect**: If no session exists, the user is automatically redirected to Keycloak login
+4. **Post-Login**: After successful authentication with Keycloak, the user is redirected back to the requested page
+5. **Logout**: Clicking "Sign out" resolves a Keycloak logout URL with post-logout redirect, clears the session, and returns to the app, which immediately redirects unauthenticated users to Keycloak login
+6. **Session Restoration**: On subsequent visits, the user's session is automatically restored from cookies
+
+### Key Points
+
+- No dedicated `/login` route—authentication happens automatically via Keycloak redirect
+- No "Sign in" button in the header—unauthenticated users see a loading spinner
+- Header only shows username and "Sign out" button when authenticated
+- App routes (`/`, `/hangar`, `/staff`) integrate seamlessly with the automatic auth flow
+- Data routes under `/api/...` and `/api/electric/...` return `401 Unauthorized` when no valid session is present
+- The `AuthInitializer` component handles all session checks and redirects at the root level
+
+### Environment Variables
+
+Add these values to `.env`:
+
+```bash
+POSTGRES_ADMIN_USER=postgres
+POSTGRES_ADMIN_PASSWORD=postgres_dev_password
+POSTGRES_PORT=5432
+APP_DB_NAME=checkpad
+APP_DB_USER=checkpad
+APP_DB_PASSWORD=checkpad_dev_password
+KEYCLOAK_DB_NAME=keycloak
+KEYCLOAK_DB_USER=keycloak
+KEYCLOAK_DB_PASSWORD=keycloak_dev_password
+BOOTSTRAP_DATABASE_URL=postgresql://postgres:postgres_dev_password@localhost:5432/postgres
+DATABASE_URL=postgresql://checkpad:checkpad_dev_password@localhost:5432/checkpad
+BETTER_AUTH_URL=http://localhost:5371
+VITE_BETTER_AUTH_URL=http://localhost:5371
+BETTER_AUTH_SECRET=dev-only-better-auth-secret-change-me
+KEYCLOAK_PORT=9090
+KEYCLOAK_START_MODE=dev
+KEYCLOAK_REALM=checkpad
+KEYCLOAK_ADMIN=admin
+KEYCLOAK_ADMIN_PASSWORD=admin
+KEYCLOAK_HOSTNAME=localhost
+KEYCLOAK_HTTP_ENABLED=true
+KEYCLOAK_HOSTNAME_STRICT=false
+KEYCLOAK_HOSTNAME_STRICT_HTTPS=false
+KEYCLOAK_PROXY_HEADERS=forwarded
+KEYCLOAK_ISSUER=http://localhost:9090/realms/checkpad
+KEYCLOAK_CLIENT_ID=checkpad-web
+KEYCLOAK_CLIENT_SECRET=dev-secret
+KEYCLOAK_APP_ORIGIN=http://localhost:5371
+KEYCLOAK_APP_CALLBACK_URL=http://localhost:5371/api/auth/oauth2/callback/keycloak
+KEYCLOAK_SUPER_ADMIN_USERNAME=elite.jet
+KEYCLOAK_SUPER_ADMIN_FIRST_NAME=Elite
+KEYCLOAK_SUPER_ADMIN_LAST_NAME=Jet
+KEYCLOAK_SUPER_ADMIN_PASSWORD=1234test
+```
+
+### Keycloak First-Start Behavior
+
+The Keycloak realm is generated from environment variables and imported on startup.
+
+- On first startup (or with a fresh Keycloak database), import creates the realm, client, and configured super-admin user.
+- On subsequent startups with the same Keycloak database, import keeps existing data and does not overwrite users or passwords.
+- If you change values like `KEYCLOAK_SUPER_ADMIN_PASSWORD` later, those changes are not applied automatically to an existing user.
+
+To apply changed credentials after first import:
+
+- Update the user in Keycloak Admin Console, or
+- Reinitialize Keycloak realm/database data and start again.
+
+### Better Auth Schema
+
+- Better Auth tables are generated into `src/db/auth-schema.ts`
+- Those tables are re-exported from `src/db/schema.ts`
+- Regenerate the schema with:
+
+```bash
+npx auth@latest generate --config src/lib/auth.ts --output src/db/auth-schema.ts --yes
+```
 
 ---
 
@@ -317,14 +426,17 @@ The previous `todos` table has been removed in favor of maintenance case trackin
 ### Migration Workflow
 
 ```bash
-# 1. Generate migration from schema changes
+# 1. Ensure DB infrastructure exists (safe on fresh and existing systems)
+npm run db:bootstrap
+
+# 2. Generate migration from schema changes
 npm run db:generate
 
-# 2. Apply migration to database
+# 3. Apply migration to database
 npm run db:push      # Development (direct schema push)
 npm run db:migrate   # Production (run migrations)
 
-# 3. Open Drizzle Studio (optional)
+# 4. Open Drizzle Studio (optional)
 npm run db:studio
 ```
 
@@ -388,7 +500,7 @@ Collections are configured to read via the Electric proxy while mutations hit th
 ### Available Scripts
 
 ```bash
-npm run dev          # Start development server (port 3000)
+npm run dev          # Start development server (port 5371)
 npm run build        # Build for production
 npm run preview      # Preview production build
 npm run test         # Run tests
@@ -398,6 +510,7 @@ npm run check        # Format + lint (auto-fix)
 npm run deploy       # Deploy to Cloudflare Workers
 npm run db:generate  # Generate database migrations
 npm run db:migrate   # Run database migrations
+npm run db:bootstrap # Create/repair DB infrastructure
 npm run db:push      # Push schema to database (dev)
 npm run db:studio    # Open Drizzle Studio
 ```

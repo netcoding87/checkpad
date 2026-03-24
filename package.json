@@ -13,6 +13,7 @@
     "check": "prettier --write . && eslint --fix",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:bootstrap": "./scripts/db/bootstrap.sh",
     "db:push": "drizzle-kit push",
     "db:pull": "drizzle-kit pull",
     "db:seed": "tsx scripts/seed.ts",

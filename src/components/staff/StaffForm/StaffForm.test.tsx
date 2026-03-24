@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { StaffForm } from './StaffForm'
 import { render, screen, waitFor } from '@/test/utils'
@@ -18,10 +19,11 @@ describe.skip('StaffForm', () => {
 
   it('requires first name', async () => {
     const mockSubmit = vi.fn()
+    const user = userEvent.setup()
     render(<StaffForm onSubmit={mockSubmit} onCancel={vi.fn()} />)
 
     const submitButton = screen.getByRole('button', { name: /save/i })
-    submitButton.click()
+    await user.click(submitButton)
 
     await waitFor(() => {
       expect(screen.getByText('First name is required')).toBeInTheDocument()
@@ -30,10 +32,11 @@ describe.skip('StaffForm', () => {
 
   it('requires last name', async () => {
     const mockSubmit = vi.fn()
+    const user = userEvent.setup()
     render(<StaffForm onSubmit={mockSubmit} onCancel={vi.fn()} />)
 
     const submitButton = screen.getByRole('button', { name: /save/i })
-    submitButton.click()
+    await user.click(submitButton)
 
     await waitFor(() => {
       expect(screen.getByText('Last name is required')).toBeInTheDocument()
@@ -42,33 +45,43 @@ describe.skip('StaffForm', () => {
 
   it('requires valid email', async () => {
     const mockSubmit = vi.fn()
+    const user = userEvent.setup()
     render(<StaffForm onSubmit={mockSubmit} onCancel={vi.fn()} />)
 
-    const emailInput = screen.getByLabelText('Email')
-    emailInput.click()
-    emailInput.focus()
-    screen.getByDisplayValue('').type('invalid-email')
-    screen.getByDisplayValue('invalid-email').blur()
+    const emailInput = screen.getByLabelText<HTMLInputElement>('E-Mail')
+
+    await user.click(emailInput)
+    await user.type(emailInput, 'invalid-email')
+    emailInput.blur()
 
     const submitButton = screen.getByRole('button', { name: /save/i })
-    submitButton.click()
+    await user.click(submitButton)
 
     await waitFor(() => {
-      expect(screen.getByText('Valid email is required')).toBeInTheDocument()
+      expect(
+        screen.getByText('Gültige E-Mail erforderlich'),
+      ).toBeInTheDocument()
     })
   })
 
   it('submits form with valid data', async () => {
     const mockSubmit = vi.fn()
+    const user = userEvent.setup()
     render(<StaffForm onSubmit={mockSubmit} onCancel={vi.fn()} />)
 
-    screen.getByLabelText('First Name').value = 'John'
-    screen.getByLabelText('Last Name').value = 'Doe'
-    screen.getByLabelText('Email').value = 'john@example.com'
-    screen.getByLabelText('Hourly Rate').value = '85.00'
+    await user.type(screen.getByLabelText<HTMLInputElement>('Vorname'), 'John')
+    await user.type(screen.getByLabelText<HTMLInputElement>('Nachname'), 'Doe')
+    await user.type(
+      screen.getByLabelText<HTMLInputElement>('E-Mail'),
+      'john@example.com',
+    )
+    await user.type(
+      screen.getByLabelText<HTMLInputElement>('Stundensatz (EUR)'),
+      '85.00',
+    )
 
     const submitButton = screen.getByRole('button', { name: /save/i })
-    submitButton.click()
+    await user.click(submitButton)
 
     await waitFor(() => {
       expect(mockSubmit).toHaveBeenCalled()
@@ -114,7 +127,9 @@ describe.skip('StaffForm', () => {
 
     render(<StaffForm onSubmit={vi.fn()} onCancel={mockCancel} />)
 
-    screen.getByLabelText('First Name').value = 'John'
+    const firstNameInput = screen.getByLabelText<HTMLInputElement>('Vorname')
+    firstNameInput.focus()
+    firstNameInput.value = 'John'
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i })
     cancelButton.click()

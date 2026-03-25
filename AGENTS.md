@@ -158,7 +158,6 @@ vitest related --run  # Run tests related to changed files
    - Password: `1234test`
 
 `docker compose up -d` runs the `db-bootstrap` one-shot service automatically.
-The service is built from `scripts/db/Dockerfile.bootstrap` and embeds `bootstrap-infra.sql` so Compose deployments do not depend on host bind mounts.
 Run `npm run db:bootstrap` manually only when infrastructure is not managed by Compose.
 
 **Docker Services:**
@@ -412,7 +411,7 @@ This Dockerfile is compatible with [Coolify](https://coolify.io/) for self-hoste
 - Health checks are configured (GET / every 30s)
 - No special configuration required - Coolify handles orchestration
 
-For Compose-based deployments, `db-bootstrap` runs as an idempotent one-shot service (with embedded SQL script) and both `keycloak` and `electric` wait for successful completion.
+For Compose-based deployments, `db-bootstrap` runs as an idempotent one-shot service and both `keycloak` and `electric` wait for successful completion.
 
 **Optional: Database Migrations on Deploy**
 

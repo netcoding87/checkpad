@@ -24,10 +24,7 @@ services:
       retries: 5
 
   db-bootstrap:
-    build:
-      context: ./scripts/db
-      dockerfile: Dockerfile.bootstrap
-    image: checkpad-db-bootstrap:local
+    image: postgres:18-alpine
     container_name: checkpad-db-bootstrap
     restart: 'no'
     entrypoint:
@@ -48,7 +45,9 @@ services:
       - -v
       - keycloak_db_password=${KEYCLOAK_DB_PASSWORD}
       - -f
-      - /bootstrap/bootstrap-infra.sql
+      - /scripts/bootstrap-infra.sql
+    volumes:
+      - ./scripts/db:/scripts:ro
     depends_on:
       checkpad-postgres:
         condition: service_healthy

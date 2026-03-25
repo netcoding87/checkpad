@@ -127,6 +127,7 @@ checkpad/
 5. **Initialize database**
 
 The Compose stack runs database bootstrap automatically via the `db-bootstrap` service.
+The service builds a tiny image from `scripts/db/Dockerfile.bootstrap` and embeds `bootstrap-infra.sql`, avoiding host bind-mount path issues on managed platforms.
 
 ```bash
  npm run db:generate   # Generate migrations from schema

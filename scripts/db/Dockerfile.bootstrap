@@ -1,0 +1,4 @@
+FROM postgres:18-alpine
+
+# Bundle the SQL bootstrap script into the image so deployments do not rely on host bind mounts.
+COPY bootstrap-infra.sql /bootstrap/bootstrap-infra.sql

@@ -1,0 +1,16 @@
+services:
+  checkpad-postgres:
+    ports:
+      - "5432:5432"
+
+  electric:
+    ports:
+      - "3000:3000"
+
+  keycloak:
+    ports:
+      - "9090:8080"
+
+  pgadmin:
+    ports:
+      - "5050:80"

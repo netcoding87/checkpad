@@ -1,6 +1,6 @@
 # AGENTS.md
 
-**Last Updated:** March 24, 2026
+**Last Updated:** March 27, 2026
 
 This document serves as a living guide for AI agents working on the checkPAD project. It should be updated whenever significant changes occur in architecture, dependencies, or conventions.
 
@@ -156,6 +156,9 @@ vitest related --run  # Run tests related to changed files
 7. Sign in through Keycloak using the imported dev realm user:
    - Username: `elite.jet`
    - Password: `1234test`
+   - Email: `KEYCLOAK_SUPER_ADMIN_EMAIL` (imported into the realm user on first startup)
+
+The imported Keycloak dev user receives username, email, first name, last name, and password from the `KEYCLOAK_SUPER_ADMIN_*` environment variables during first realm import.
 
 `docker compose up -d` runs the `db-bootstrap` one-shot service automatically.
 Run `npm run db:bootstrap` manually only when infrastructure is not managed by Compose.

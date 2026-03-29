@@ -7,13 +7,14 @@ set -eu
 : "${KEYCLOAK_APP_ORIGIN:?KEYCLOAK_APP_ORIGIN is required}"
 : "${KEYCLOAK_APP_CALLBACK_URL:?KEYCLOAK_APP_CALLBACK_URL is required}"
 : "${KEYCLOAK_SUPER_ADMIN_USERNAME:?KEYCLOAK_SUPER_ADMIN_USERNAME is required}"
+: "${KEYCLOAK_SUPER_ADMIN_EMAIL:?KEYCLOAK_SUPER_ADMIN_EMAIL is required}"
 : "${KEYCLOAK_SUPER_ADMIN_PASSWORD:?KEYCLOAK_SUPER_ADMIN_PASSWORD is required}"
 : "${KEYCLOAK_SUPER_ADMIN_FIRST_NAME:?KEYCLOAK_SUPER_ADMIN_FIRST_NAME is required}"
 : "${KEYCLOAK_SUPER_ADMIN_LAST_NAME:?KEYCLOAK_SUPER_ADMIN_LAST_NAME is required}"
 : "${KEYCLOAK_ADMIN:?KEYCLOAK_ADMIN is required}"
 : "${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD is required}"
 
-IMPORT_DIR="/opt/keycloak/data/import"
+IMPORT_DIR="${KEYCLOAK_IMPORT_DIR:-/opt/keycloak/data/import}"
 REALM_FILE="${IMPORT_DIR}/checkpad-realm.json"
 
 mkdir -p "${IMPORT_DIR}"
@@ -70,6 +71,8 @@ cat > "${REALM_FILE}" <<EOF
     {
       "username": "${KEYCLOAK_SUPER_ADMIN_USERNAME}",
       "enabled": true,
+      "email": "${KEYCLOAK_SUPER_ADMIN_EMAIL}",
+      "emailVerified": true,
       "firstName": "${KEYCLOAK_SUPER_ADMIN_FIRST_NAME}",
       "lastName": "${KEYCLOAK_SUPER_ADMIN_LAST_NAME}",
       "credentials": [
@@ -86,6 +89,10 @@ cat > "${REALM_FILE}" <<EOF
   ]
 }
 EOF
+
+if [ "${KEYCLOAK_SKIP_START:-false}" = "true" ]; then
+  exit 0
+fi
 
 case "${KEYCLOAK_START_MODE:-dev}" in
   dev)

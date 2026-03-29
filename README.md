@@ -218,7 +218,6 @@ Add these values to `.env`:
 ```bash
 POSTGRES_ADMIN_USER=postgres
 POSTGRES_ADMIN_PASSWORD=postgres_dev_password
-POSTGRES_PORT=5432
 APP_DB_NAME=checkpad
 APP_DB_USER=checkpad
 APP_DB_PASSWORD=checkpad_dev_password
@@ -230,7 +229,6 @@ DATABASE_URL=postgresql://checkpad:checkpad_dev_password@localhost:5432/checkpad
 BETTER_AUTH_URL=http://localhost:5371
 VITE_BETTER_AUTH_URL=http://localhost:5371
 BETTER_AUTH_SECRET=dev-only-better-auth-secret-change-me
-KEYCLOAK_PORT=9090
 KEYCLOAK_START_MODE=dev
 KEYCLOAK_REALM=checkpad
 KEYCLOAK_ADMIN=admin
@@ -238,7 +236,6 @@ KEYCLOAK_ADMIN_PASSWORD=admin
 KEYCLOAK_HOSTNAME=localhost
 KEYCLOAK_HTTP_ENABLED=true
 KEYCLOAK_HOSTNAME_STRICT=false
-KEYCLOAK_HOSTNAME_STRICT_HTTPS=false
 KEYCLOAK_PROXY_HEADERS=forwarded
 KEYCLOAK_ISSUER=http://localhost:9090/realms/checkpad
 KEYCLOAK_CLIENT_ID=checkpad-web
@@ -246,6 +243,7 @@ KEYCLOAK_CLIENT_SECRET=dev-secret
 KEYCLOAK_APP_ORIGIN=http://localhost:5371
 KEYCLOAK_APP_CALLBACK_URL=http://localhost:5371/api/auth/oauth2/callback/keycloak
 KEYCLOAK_SUPER_ADMIN_USERNAME=elite.jet
+KEYCLOAK_SUPER_ADMIN_EMAIL=elite.jet@checkpad.local
 KEYCLOAK_SUPER_ADMIN_FIRST_NAME=Elite
 KEYCLOAK_SUPER_ADMIN_LAST_NAME=Jet
 KEYCLOAK_SUPER_ADMIN_PASSWORD=1234test
@@ -258,6 +256,7 @@ The Keycloak realm is generated from environment variables and imported on start
 When started through Docker Compose, Keycloak waits until `db-bootstrap` completed successfully, ensuring Keycloak DB/user prerequisites exist before startup.
 
 - On first startup (or with a fresh Keycloak database), import creates the realm, client, and configured super-admin user.
+- The imported super-admin user gets username, email, first name, last name, and password from the `KEYCLOAK_SUPER_ADMIN_*` environment variables.
 - On subsequent startups with the same Keycloak database, import keeps existing data and does not overwrite users or passwords.
 - If you change values like `KEYCLOAK_SUPER_ADMIN_PASSWORD` later, those changes are not applied automatically to an existing user.
 

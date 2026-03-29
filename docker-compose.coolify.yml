@@ -1,0 +1,7 @@
+services:
+  electric:
+    environment:
+      ELECTRIC_INSECURE: false
+  keycloak:
+    environment:
+      KC_HOSTNAME: ${COOLIFY_FQDN}

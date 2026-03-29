@@ -218,7 +218,6 @@ Add these values to `.env`:
 ```bash
 POSTGRES_ADMIN_USER=postgres
 POSTGRES_ADMIN_PASSWORD=postgres_dev_password
-POSTGRES_PORT=5432
 APP_DB_NAME=checkpad
 APP_DB_USER=checkpad
 APP_DB_PASSWORD=checkpad_dev_password
@@ -230,7 +229,6 @@ DATABASE_URL=postgresql://checkpad:checkpad_dev_password@localhost:5432/checkpad
 BETTER_AUTH_URL=http://localhost:5371
 VITE_BETTER_AUTH_URL=http://localhost:5371
 BETTER_AUTH_SECRET=dev-only-better-auth-secret-change-me
-KEYCLOAK_PORT=9090
 KEYCLOAK_START_MODE=dev
 KEYCLOAK_REALM=checkpad
 KEYCLOAK_ADMIN=admin
@@ -238,7 +236,6 @@ KEYCLOAK_ADMIN_PASSWORD=admin
 KEYCLOAK_HOSTNAME=localhost
 KEYCLOAK_HTTP_ENABLED=true
 KEYCLOAK_HOSTNAME_STRICT=false
-KEYCLOAK_HOSTNAME_STRICT_HTTPS=false
 KEYCLOAK_PROXY_HEADERS=forwarded
 KEYCLOAK_ISSUER=http://localhost:9090/realms/checkpad
 KEYCLOAK_CLIENT_ID=checkpad-web

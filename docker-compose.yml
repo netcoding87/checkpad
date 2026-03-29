@@ -1,13 +1,10 @@
 services:
   checkpad-postgres:
     image: postgres:18-alpine
-    container_name: checkpad-postgres
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_ADMIN_USER}
       POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
-    ports:
-      - '${POSTGRES_PORT:-5432}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     tmpfs:
@@ -25,7 +22,6 @@ services:
 
   db-bootstrap:
     image: postgres:18-alpine
-    container_name: checkpad-db-bootstrap
     restart: 'no'
     entrypoint:
       - psql
@@ -54,15 +50,10 @@ services:
 
   electric:
     image: docker.io/electricsql/electric:latest
-    container_name: checkpad-electric
     restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://${APP_DB_USER}:${APP_DB_PASSWORD}@checkpad-postgres:5432/${APP_DB_NAME}?sslmode=disable
-      # Not suitable for production. Only use insecure mode in development or if you've otherwise secured the Electric API.
-      # See https://electric-sql.com/docs/guides/security
       ELECTRIC_INSECURE: true
-    ports:
-      - '3000:3000'
     depends_on:
       checkpad-postgres:
         condition: service_healthy
@@ -77,7 +68,6 @@ services:
 
   keycloak:
     image: quay.io/keycloak/keycloak:26.5.6
-    container_name: checkpad-keycloak
     restart: unless-stopped
     environment:
       KC_DB: postgres
@@ -104,10 +94,9 @@ services:
       KEYCLOAK_SUPER_ADMIN_LAST_NAME: ${KEYCLOAK_SUPER_ADMIN_LAST_NAME}
       KEYCLOAK_SUPER_ADMIN_PASSWORD: ${KEYCLOAK_SUPER_ADMIN_PASSWORD}
     entrypoint: ['/bin/sh', '/opt/keycloak/init-keycloak.sh']
-    ports:
-      - '${KEYCLOAK_PORT:-9090}:8080'
     volumes:
       - ./keycloak/init-keycloak.sh:/opt/keycloak/init-keycloak.sh:ro
+      - ./keycloak/themes:/opt/keycloak/themes:ro
     depends_on:
       checkpad-postgres:
         condition: service_healthy
@@ -122,14 +111,11 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: checkpad-pgadmin
     restart: unless-stopped
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
-    ports:
-      - '${PGADMIN_PORT:-5050}:80'
     volumes:
       - pgadmin_data:/var/lib/pgadmin
     depends_on:

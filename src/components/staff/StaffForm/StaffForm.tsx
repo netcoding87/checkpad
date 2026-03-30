@@ -293,7 +293,7 @@ export function StaffForm({
               Schließen
             </Button>
             <Button
-              colorPalette="blue"
+              colorPalette="brand"
               disabled={form.state.isSubmitting}
               loadingText="Speichern..."
               type="submit"

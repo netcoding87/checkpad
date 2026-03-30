@@ -189,7 +189,7 @@ const Select = <T,>(
   const searchInputElementRef = useRef<HTMLInputElement>(null)
 
   const listBgColor = useColorModeValue('white', 'gray.900')
-  const highlightBgColor = useColorModeValue('blue.500', 'blue.700')
+  const highlightBgColor = useColorModeValue('brand.500', 'brand.700')
 
   const highlight = (item: SelectOption<T>, index: number) =>
     highlightedIndex === index ||

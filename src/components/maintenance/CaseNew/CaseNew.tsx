@@ -67,12 +67,17 @@ export function CaseNew() {
     navigate({ to: '/hangar' })
   }
 
+  const handleSaveAndExit = () => {
+    navigate({ to: '/hangar' })
+  }
+
   return (
     <Container maxW="3xl" py={8}>
       <Stack gap={6}>
         <Heading size="xl">Neuer Wartungsfall</Heading>
         <CaseForm
           onCancel={handleCancel}
+          onSaveAndExit={handleSaveAndExit}
           onSubmit={handleSubmit}
           submitLabel="Erstellen"
         />

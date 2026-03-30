@@ -12,7 +12,7 @@ export function StaffIndex() {
         <HStack justify="space-between">
           <Heading>Mitarbeiter</Heading>
           <Button
-            colorPalette="blue"
+            colorPalette="brand"
             onClick={() => navigate({ to: '/staff/new' })}
             size="sm"
           >

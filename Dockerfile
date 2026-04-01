@@ -53,10 +53,10 @@ RUN echo '#!/bin/sh' > /app/start.sh && \
   echo 'set -e' >> /app/start.sh && \
   echo 'echo "Running database migrations..."' >> /app/start.sh && \
   echo 'npm run db:migrate' >> /app/start.sh && \
-  echo 'if [ "$RUN_SEED" = "true" ]; then' >> /app/start.sh && \
+  # echo 'if [ "$RUN_SEED" = "true" ]; then' >> /app/start.sh && \
   echo '  echo "Running database seed..."' >> /app/start.sh && \
   echo '  npm run db:seed' >> /app/start.sh && \
-  echo 'fi' >> /app/start.sh && \
+  # echo 'fi' >> /app/start.sh && \
   echo 'echo "Starting server..."' >> /app/start.sh && \
   echo 'exec node .output/server/index.mjs' >> /app/start.sh && \
   chmod +x /app/start.sh

@@ -1,64 +1,10 @@
 services:
-  checkpad-postgres:
-    image: postgres:18-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_ADMIN_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_ADMIN_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    tmpfs:
-      - /tmp
-    command:
-      - -c
-      - listen_addresses=*
-      - -c
-      - wal_level=logical
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_ADMIN_USER}']
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  db-bootstrap:
-    image: postgres:18-alpine
-    restart: 'no'
-    entrypoint:
-      - psql
-      - postgresql://${POSTGRES_ADMIN_USER}:${POSTGRES_ADMIN_PASSWORD}@checkpad-postgres:5432/postgres
-      - -v
-      - ON_ERROR_STOP=1
-      - -v
-      - app_db_name=${APP_DB_NAME}
-      - -v
-      - app_db_user=${APP_DB_USER}
-      - -v
-      - app_db_password=${APP_DB_PASSWORD}
-      - -v
-      - keycloak_db_name=${KEYCLOAK_DB_NAME}
-      - -v
-      - keycloak_db_user=${KEYCLOAK_DB_USER}
-      - -v
-      - keycloak_db_password=${KEYCLOAK_DB_PASSWORD}
-      - -f
-      - /scripts/bootstrap-infra.sql
-    volumes:
-      - ./scripts/db:/scripts:ro
-    depends_on:
-      checkpad-postgres:
-        condition: service_healthy
-
   electric:
     image: docker.io/electricsql/electric:latest
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://${APP_DB_USER}:${APP_DB_PASSWORD}@checkpad-postgres:5432/${APP_DB_NAME}?sslmode=disable
+      DATABASE_URL: postgresql://${APP_DB_USER}:${APP_DB_PASSWORD}@${APP_DB_URL_HOST:-checkpad-app-postgres}:${APP_DB_URL_PORT:-5432}/${APP_DB_NAME}?sslmode=disable
       ELECTRIC_INSECURE: true
-    depends_on:
-      checkpad-postgres:
-        condition: service_healthy
-      db-bootstrap:
-        condition: service_completed_successfully
     healthcheck:
       test: ['CMD-SHELL', 'curl -fsS http://localhost:3000/v1/health || exit 1']
       interval: 10s
@@ -71,8 +17,8 @@ services:
     restart: unless-stopped
     environment:
       KC_DB: postgres
-      KC_DB_URL_HOST: checkpad-postgres
-      KC_DB_URL_PORT: 5432
+      KC_DB_URL_HOST: ${KEYCLOAK_DB_URL_HOST:-checkpad-keycloak-postgres}
+      KC_DB_URL_PORT: ${KEYCLOAK_DB_URL_PORT:-5432}
       KC_DB_URL_DATABASE: ${KEYCLOAK_DB_NAME}
       KC_DB_USERNAME: ${KEYCLOAK_DB_USER}
       KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
@@ -97,11 +43,6 @@ services:
     volumes:
       - ./keycloak/init-keycloak.sh:/opt/keycloak/init-keycloak.sh:ro
       - ./keycloak/themes:/opt/keycloak/themes:ro
-    depends_on:
-      checkpad-postgres:
-        condition: service_healthy
-      db-bootstrap:
-        condition: service_completed_successfully
     healthcheck:
       test: ['CMD-SHELL', '/usr/bin/bash -lc "exec 3<>/dev/tcp/127.0.0.1/8080"']
       interval: 10s
@@ -118,9 +59,6 @@ services:
       PGADMIN_CONFIG_SERVER_MODE: 'False'
     volumes:
       - pgadmin_data:/var/lib/pgadmin
-    depends_on:
-      checkpad-postgres:
-        condition: service_healthy
     healthcheck:
       test: ['CMD', 'wget', '-O', '-', 'http://localhost:80/misc/ping']
       interval: 10s
@@ -129,5 +67,4 @@ services:
       start_period: 20s
 
 volumes:
-  postgres_data:
   pgadmin_data:

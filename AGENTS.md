@@ -160,13 +160,13 @@ vitest related --run  # Run tests related to changed files
 
 The imported Keycloak dev user receives username, email, first name, last name, and password from the `KEYCLOAK_SUPER_ADMIN_*` environment variables during first realm import.
 
-`docker compose up -d` runs the `db-bootstrap` one-shot service automatically.
-Run `npm run db:bootstrap` manually only when infrastructure is not managed by Compose.
+`docker compose up -d` first initializes two dedicated local postgres services: one for app runtime and one for Keycloak runtime.
+It does not apply the app schema; local development still requires `npm run db:push` or `npm run db:migrate` after infrastructure is available.
 
 **Docker Services:**
 
-- **PostgreSQL** (port 5432): Main database
-- **db-bootstrap**: One-shot role/database bootstrap service (idempotent)
+- **App PostgreSQL** (port 5432): App database runtime
+- **Keycloak PostgreSQL** (port 5433): Keycloak database runtime
 - **pgAdmin** (port 5050): Database management UI
 - **ElectricSQL** (port 3000): Sync service
 - **Keycloak** (port 9090): Development identity provider with imported `checkpad` realm
@@ -281,11 +281,10 @@ The legacy `todos` table has been removed in favor of maintenance case tracking 
 
 **Workflow:**
 
-1. Ensure DB infrastructure exists (`npm run db:bootstrap` if not using Compose-managed bootstrap)
-2. Modify `src/db/schema.ts`
-3. Generate migration: `npm run db:generate`
-4. Apply migration: `npm run db:migrate` (production) or `npm run db:push` (dev)
-5. Optionally open Drizzle Studio: `npm run db:studio`
+1. Modify `src/db/schema.ts`
+2. Generate migration: `npm run db:generate`
+3. Apply migration: `npm run db:migrate` (production/container startup) or `npm run db:push` (dev)
+4. Optionally open Drizzle Studio: `npm run db:studio`
 
 ### Seeding
 
@@ -412,9 +411,10 @@ This Dockerfile is compatible with [Coolify](https://coolify.io/) for self-hoste
 
 - Coolify will auto-detect and build the Dockerfile
 - Health checks are configured (GET / every 30s)
+- The runtime container runs `npm run db:migrate` before starting the app server and exits on migration failure
 - No special configuration required - Coolify handles orchestration
 
-For Compose-based deployments, `db-bootstrap` runs as an idempotent one-shot service and both `keycloak` and `electric` wait for successful completion.
+For Compose-based deployments, `electric` waits for the app postgres service and `keycloak` waits for the keycloak postgres service.
 
 **Optional: Database Migrations on Deploy**
 

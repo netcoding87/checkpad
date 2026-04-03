@@ -42,10 +42,10 @@ describe('init-keycloak.sh', () => {
         clients: Array<{
           clientId: string
           secret: string
-          redirectUris: string[]
-          webOrigins: string[]
+          redirectUris: Array<string>
+          webOrigins: Array<string>
           attributes: Record<string, string>
-          defaultClientScopes: string[]
+          defaultClientScopes: Array<string>
         }>
         users: Array<{
           email: string
@@ -53,7 +53,7 @@ describe('init-keycloak.sh', () => {
           firstName: string
           lastName: string
           username: string
-          realmRoles: string[]
+          realmRoles: Array<string>
         }>
       }
 

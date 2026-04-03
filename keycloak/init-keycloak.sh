@@ -15,7 +15,7 @@ set -eu
 : "${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD is required}"
 
 IMPORT_DIR="${KEYCLOAK_IMPORT_DIR:-/opt/keycloak/data/import}"
-REALM_FILE="${IMPORT_DIR}/checkpad-realm.json"
+REALM_FILE="${IMPORT_DIR}/${KEYCLOAK_REALM}-realm.json"
 
 mkdir -p "${IMPORT_DIR}"
 

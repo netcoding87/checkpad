@@ -16,6 +16,7 @@ set -eu
 
 IMPORT_DIR="${KEYCLOAK_IMPORT_DIR:-/opt/keycloak/data/import}"
 REALM_FILE="${IMPORT_DIR}/${KEYCLOAK_REALM}-realm.json"
+LOGIN_THEME="${KEYCLOAK_LOGIN_THEME:-checkpad}"
 
 mkdir -p "${IMPORT_DIR}"
 
@@ -26,6 +27,7 @@ cat > "${REALM_FILE}" <<EOF
   "sslRequired": "none",
   "registrationAllowed": false,
   "rememberMe": true,
+  "loginTheme": "${LOGIN_THEME}",
   "loginWithEmailAllowed": false,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": true,

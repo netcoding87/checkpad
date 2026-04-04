@@ -45,7 +45,7 @@ export function AuthInitializer({ children }: { children: React.ReactNode }) {
     return (
       <Center h="100vh" w="100%">
         <VStack gap={4}>
-          <Spinner aria-label="Loading" color="cyan.500" size="xl" />
+          <Spinner aria-label="Loading" color="brand.500" size="xl" />
           <Box>
             <Text color="gray.500" fontSize="xs" fontWeight="medium">
               Initializing your app...

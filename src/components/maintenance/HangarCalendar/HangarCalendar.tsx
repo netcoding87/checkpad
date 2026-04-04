@@ -275,7 +275,7 @@ export function HangarCalendar() {
                 <ChevronRight size={18} />
               </IconButton>
             </HStack>
-            <Button asChild colorPalette="blue" size="sm">
+            <Button asChild colorPalette="brand" size="sm">
               <Link to="/hangar/new">
                 <Plus size={16} />
                 Neuer Eintrag
@@ -378,7 +378,7 @@ export function HangarCalendar() {
                                     assignedStaffNames[maintenanceCase.id] ?? []
                                   ).join(', ')}
                                 >
-                                  <Badge colorPalette="blue" fontSize="xs">
+                                  <Badge colorPalette="brand" fontSize="xs">
                                     {staffCount}
                                   </Badge>
                                 </Tooltip>

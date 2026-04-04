@@ -19,7 +19,7 @@ export function LoginPage() {
         <Text color="fg.muted">
           Access is restricted to authorized users. Continue with Keycloak.
         </Text>
-        <Button colorPalette="cyan" onClick={handleSignIn} size="lg">
+        <Button colorPalette="brand" onClick={handleSignIn} size="lg">
           Sign in with Keycloak
         </Button>
       </Stack>

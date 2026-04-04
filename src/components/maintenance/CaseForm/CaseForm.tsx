@@ -382,7 +382,7 @@ export function CaseForm({
             <Button onClick={handleClose} type="button" variant="ghost">
               Schließen
             </Button>
-            <ButtonGroup colorPalette="blue" attached>
+            <ButtonGroup colorPalette="brand" attached>
               <Button
                 borderBottomRightRadius={0}
                 borderTopRightRadius={0}

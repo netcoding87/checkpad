@@ -1,0 +1,54 @@
+/* ─── Background ──────────────────────────────────────────────── */
+body {
+  background-image:
+    linear-gradient(rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.35)),
+    url('../img/hangar-background.jpg') !important;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 100vh;
+}
+
+.login-pf-page {
+  min-height: 100vh;
+}
+
+/* ─── Brand color: Keycloak default blue ─────────────────────── */
+
+/* 1. Global primary & link tokens — covers input focus ring,
+      button variants, link colors everywhere via PF cascade    */
+:root {
+  --pf-v5-global--primary-color--100: #0066cc;
+  --pf-v5-global--primary-color--200: #004d99;
+  --pf-v5-global--primary-color--300: #003366;
+  --pf-v5-global--link--Color--dark: #0066cc;
+  --pf-v5-global--link--Color--dark--hover: #004d99;
+  --pf-v5-global--link--Color--light: #0066cc;
+  --pf-v5-global--link--Color--light--hover: #004d99;
+}
+
+/* 2. Card top bar */
+:root {
+  --keycloak-card-top-color: #4394e5;
+}
+
+/* 3. Primary button — explicit fallback for browsers that don't
+      resolve PF component tokens from global tokens directly    */
+.pf-v5-c-button.pf-m-primary,
+#kc-login {
+  --pf-v5-c-button--m-primary--BackgroundColor: #0066cc;
+  --pf-v5-c-button--m-primary--hover--BackgroundColor: #004d99;
+  --pf-v5-c-button--m-primary--focus--BackgroundColor: #0066cc;
+  --pf-v5-c-button--m-primary--active--BackgroundColor: #003366;
+  background-color: #0066cc;
+}
+
+.pf-v5-c-button.pf-m-primary:hover,
+#kc-login:hover {
+  background-color: #004d99;
+}
+
+.pf-v5-c-button.pf-m-primary:active,
+#kc-login:active {
+  background-color: #003366;
+}

@@ -117,24 +117,26 @@ checkpad/
    ```
 
    This starts:
-   - PostgreSQL (port 5432)
-
-- db-bootstrap (one-shot initialization of roles/databases)
-- pgAdmin (port 5050)
-- ElectricSQL (port 3000)
-- Keycloak (port 9090)
+   - App PostgreSQL (port 5432)
+   - Keycloak PostgreSQL (port 5433)
+   - pgAdmin (port 5050)
+   - ElectricSQL (port 3000)
+   - Keycloak (port 9090)
 
 5. **Initialize database**
 
-The Compose stack runs database bootstrap automatically via the `db-bootstrap` service.
+On first local container creation, each PostgreSQL container initializes its own runtime user and database:
+
+- app postgres uses `APP_DB_USER` + `APP_DB_NAME`
+- keycloak postgres uses `KEYCLOAK_DB_USER` + `KEYCLOAK_DB_NAME`
 
 ```bash
- npm run db:generate   # Generate migrations from schema
- npm run db:push       # Apply app schema to app database
- npm run db:seed       # Seed the database with initial data (optional)
+npm run db:generate   # Generate migrations from schema
+npm run db:push       # Apply app schema to app database in local dev
+npm run db:seed       # Seed the database with initial data (optional)
 ```
 
-    Run `npm run db:bootstrap` manually only if you are not using Docker Compose for infrastructure.
+In deployed environments, the container runs `npm run db:migrate` before the server starts, so schema creation stays automatic there.
 
 6. **Start development server**
 
@@ -216,15 +218,12 @@ Authentication is provided by **better-auth** with **Keycloak** as the OIDC iden
 Add these values to `.env`:
 
 ```bash
-POSTGRES_ADMIN_USER=postgres
-POSTGRES_ADMIN_PASSWORD=postgres_dev_password
 APP_DB_NAME=checkpad
 APP_DB_USER=checkpad
 APP_DB_PASSWORD=checkpad_dev_password
 KEYCLOAK_DB_NAME=keycloak
 KEYCLOAK_DB_USER=keycloak
 KEYCLOAK_DB_PASSWORD=keycloak_dev_password
-BOOTSTRAP_DATABASE_URL=postgresql://postgres:postgres_dev_password@localhost:5432/postgres
 DATABASE_URL=postgresql://checkpad:checkpad_dev_password@localhost:5432/checkpad
 BETTER_AUTH_URL=http://localhost:5371
 VITE_BETTER_AUTH_URL=http://localhost:5371
@@ -253,7 +252,7 @@ KEYCLOAK_SUPER_ADMIN_PASSWORD=1234test
 
 The Keycloak realm is generated from environment variables and imported on startup.
 
-When started through Docker Compose, Keycloak waits until `db-bootstrap` completed successfully, ensuring Keycloak DB/user prerequisites exist before startup.
+When started through Docker Compose, Keycloak waits for the local Keycloak postgres service to become healthy before startup.
 
 - On first startup (or with a fresh Keycloak database), import creates the realm, client, and configured super-admin user.
 - The imported super-admin user gets username, email, first name, last name, and password from the `KEYCLOAK_SUPER_ADMIN_*` environment variables.
@@ -432,13 +431,10 @@ The previous `todos` table has been removed in favor of maintenance case trackin
 ### Migration Workflow
 
 ```bash
-# 1. Ensure DB infrastructure exists (needed when infra is not bootstrapped by Compose)
-npm run db:bootstrap
-
-# 2. Generate migration from schema changes
+# 1. Generate migration from schema changes
 npm run db:generate
 
-# 3. Apply migration to database
+# 2. Apply migration to database
 npm run db:push      # Development (direct schema push)
 npm run db:migrate   # Production (run migrations)
 
@@ -515,8 +511,7 @@ npm run format       # Format code with Prettier
 npm run check        # Format + lint (auto-fix)
 npm run deploy       # Deploy to Cloudflare Workers
 npm run db:generate  # Generate database migrations
-npm run db:migrate   # Run database migrations
-npm run db:bootstrap # Create/repair DB infrastructure
+npm run db:migrate   # Run app migrations (used by the production container before startup)
 npm run db:push      # Push schema to database (dev)
 npm run db:studio    # Open Drizzle Studio
 ```
@@ -572,7 +567,7 @@ import { Dashboard } from '../../components/maintenance/Dashboard'
 
 The application is containerized and ready for self-hosting platforms like [Coolify](https://coolify.io/).
 
-For Compose-based deployments, the stack includes an idempotent `db-bootstrap` one-shot service. `keycloak` and `electric` depend on its successful completion.
+For Compose-based deployments, `electric` waits for the app postgres service and `keycloak` waits for the keycloak postgres service.
 
 ```bash
 # Build Docker image

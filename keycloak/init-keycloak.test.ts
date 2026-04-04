@@ -35,15 +35,54 @@ describe('init-keycloak.sh', () => {
 
       const realmFile = join(importDir, 'checkpad-realm.json')
       const realm = JSON.parse(await readFile(realmFile, 'utf8')) as {
+        loginWithEmailAllowed: boolean
+        roles: {
+          realm: Array<{ name: string }>
+        }
+        clients: Array<{
+          clientId: string
+          secret: string
+          redirectUris: Array<string>
+          webOrigins: Array<string>
+          attributes: Record<string, string>
+          defaultClientScopes: Array<string>
+        }>
         users: Array<{
           email: string
           emailVerified: boolean
           firstName: string
           lastName: string
           username: string
+          realmRoles: Array<string>
         }>
       }
 
+      // Realm-level settings
+      expect(realm.loginWithEmailAllowed).toBe(false)
+
+      // Realm roles
+      expect(realm.roles.realm.map((r) => r.name)).toContain('super_admin')
+
+      // Client configuration
+      expect(realm.clients).toHaveLength(1)
+      expect(realm.clients[0]).toMatchObject({
+        clientId: 'checkpad-web',
+        secret: 'dev-secret',
+        redirectUris: expect.arrayContaining([
+          'http://localhost:5371/api/auth/oauth2/callback/keycloak',
+          'http://localhost:5371/*',
+        ]),
+        webOrigins: ['http://localhost:5371'],
+        attributes: { 'pkce.code.challenge.method': 'S256' },
+        defaultClientScopes: expect.arrayContaining([
+          'web-origins',
+          'profile',
+          'roles',
+          'email',
+        ]),
+      })
+
+      // Super-admin user
       expect(realm.users).toHaveLength(1)
       expect(realm.users[0]).toMatchObject({
         email: 'elite.jet@checkpad.local',
@@ -51,6 +90,7 @@ describe('init-keycloak.sh', () => {
         firstName: 'Elite',
         lastName: 'Jet',
         username: 'elite.jet',
+        realmRoles: expect.arrayContaining(['super_admin']),
       })
     } finally {
       await rm(importDir, { force: true, recursive: true })
